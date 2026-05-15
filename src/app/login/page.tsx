@@ -33,42 +33,61 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="mx-auto max-w-md mt-10">
-      <div className="glass p-7">
-        <h1 className="text-2xl font-display font-bold">Welcome back</h1>
-        <p className="text-sm opacity-75">Sign in to continue your quest.</p>
-        <form className="mt-6 space-y-3" onSubmit={onSubmit}>
+    <div className="mx-auto max-w-md mt-6 md:mt-12">
+      <div className="text-center mb-6">
+        <div className="text-5xl mb-2">👋</div>
+        <h1 className="text-3xl font-display font-black">Welcome back</h1>
+        <p className="text-sm text-[var(--text-muted)] mt-1">
+          Sign in to continue your quest.
+        </p>
+      </div>
+
+      <div className="card">
+        <form className="space-y-4" onSubmit={onSubmit}>
           <div>
-            <label className="text-sm opacity-80">Email or username</label>
+            <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
+              Email or username
+            </label>
             <input
-              className="input mt-1"
+              className="input mt-1.5"
               required
+              autoFocus
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
             />
           </div>
           <div>
-            <label className="text-sm opacity-80">Password</label>
+            <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
+              Password
+            </label>
             <input
-              className="input mt-1"
+              className="input mt-1.5"
               type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          {err && <p className="text-sm text-rose-300">{err}</p>}
-          <button className="neon-btn w-full" disabled={loading}>
+          {err && (
+            <div className="rounded-xl border border-[var(--coral)] bg-[var(--coral-soft)] px-3 py-2 text-sm font-semibold text-[var(--coral-dark)]">
+              {err}
+            </div>
+          )}
+          <button className="btn-primary w-full !py-3" disabled={loading}>
             {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
-        <p className="mt-4 text-sm opacity-75">
-          New to BaseQuest?{" "}
-          <Link className="underline text-cyan-300" href="/register">
-            Create an account
-          </Link>
-        </p>
       </div>
+
+      <p className="mt-5 text-center text-sm text-[var(--text-muted)]">
+        New to BaseQuest?{" "}
+        <Link
+          className="font-bold text-[var(--mint-dark)] hover:underline"
+          href="/register"
+        >
+          Create an account
+        </Link>
+      </p>
     </div>
   );
 }

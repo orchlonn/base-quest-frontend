@@ -29,10 +29,18 @@ function Inner() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    api<Question[]>("/questions/post-test", { auth: false }).then(setQuestions).catch(console.error);
+    api<Question[]>("/questions/post-test", { auth: false })
+      .then(setQuestions)
+      .catch(console.error);
   }, []);
 
-  if (!questions) return <p className="opacity-70">Loading post-test…</p>;
+  if (!questions) {
+    return (
+      <div className="card animate-pulse">
+        <p className="text-[var(--text-muted)]">Loading post-test…</p>
+      </div>
+    );
+  }
   if (questions.length === 0) return <p>No post-test questions available.</p>;
 
   const q = questions[idx];
@@ -43,9 +51,15 @@ function Inner() {
     setSubmitting(true);
     try {
       const payload = {
-        answers: Object.entries(answers).map(([questionId, value]) => ({ questionId, value })),
+        answers: Object.entries(answers).map(([questionId, value]) => ({
+          questionId,
+          value,
+        })),
       };
-      const result = await api("/quiz/post-test/submit", { method: "POST", body: JSON.stringify(payload) });
+      const result = await api("/quiz/post-test/submit", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
       sessionStorage.setItem("bq_posttest_result", JSON.stringify(result));
       router.push("/results");
     } catch (e) {
@@ -56,33 +70,51 @@ function Inner() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-3xl font-display font-bold">Post-Test</h1>
-      <p className="opacity-75 mt-1">Show how much you&apos;ve grown since the pre-test.</p>
-
-      <div className="mt-4 h-2 rounded-full bg-white/10 overflow-hidden">
+      <div className="flex items-center justify-between mb-2">
+        <span className="chip chip-coral">Post-test</span>
+        <span className="text-sm font-bold text-[var(--text-muted)]">
+          Question {idx + 1} of {questions.length}
+        </span>
+      </div>
+      <div
+        className="h-3 rounded-full overflow-hidden border-2 bg-white"
+        style={{ borderColor: "var(--border)" }}
+      >
         <motion.div
-          className="h-full bg-gradient-to-r from-emerald-400 to-cyan-400"
+          className="h-full"
+          style={{ background: "var(--coral)" }}
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
+          transition={{ duration: 0.4 }}
         />
       </div>
 
-      <motion.div key={q.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="glass p-6 mt-6">
-        <div className="text-xs uppercase tracking-wider opacity-70">
-          Question {idx + 1} of {questions.length} · {q.topic}
+      <h1 className="text-2xl md:text-3xl font-display font-black mt-6">
+        Time to show your growth
+      </h1>
+      <p className="text-[var(--text-muted)] mt-1">
+        Same format as the pre-test. Take your time.
+      </p>
+
+      <motion.div
+        key={q.id}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="card mt-6"
+      >
+        <span className="chip chip-lilac">{q.topic}</span>
+        <div className="font-mono text-xl md:text-2xl font-bold mt-3 break-words">
+          {q.prompt}
         </div>
-        <div className="text-lg font-mono mt-2">{q.prompt}</div>
 
         {q.type === "MULTIPLE_CHOICE" ? (
-          <div className="mt-4 grid gap-2">
+          <div className="mt-5 grid gap-2.5">
             {q.choices?.map((c) => (
               <button
                 key={c}
                 onClick={() => setAnswers((a) => ({ ...a, [q.id]: c }))}
-                className={`text-left rounded-xl border px-4 py-3 font-mono ${
-                  answers[q.id] === c
-                    ? "border-emerald-300 bg-emerald-300/10"
-                    : "border-white/15 bg-white/5 hover:border-white/30"
+                className={`mc-option font-mono ${
+                  answers[q.id] === c ? "is-selected" : ""
                 }`}
               >
                 {c}
@@ -91,28 +123,38 @@ function Inner() {
           </div>
         ) : (
           <input
-            className="input mt-4 font-mono"
+            className="input mt-5 font-mono text-lg"
             placeholder="Type your answer"
             value={answers[q.id] ?? ""}
-            onChange={(e) => setAnswers((a) => ({ ...a, [q.id]: e.target.value }))}
+            onChange={(e) =>
+              setAnswers((a) => ({ ...a, [q.id]: e.target.value }))
+            }
           />
         )}
 
-        <div className="mt-6 flex justify-between">
+        <div className="mt-7 flex justify-between gap-3">
           <button
-            className="ghost-btn"
+            className="btn-secondary"
             disabled={idx === 0}
             onClick={() => setIdx((i) => Math.max(0, i - 1))}
           >
-            Back
+            ← Back
           </button>
           {done ? (
-            <button className="neon-btn" disabled={submitting || !answers[q.id]} onClick={submit}>
+            <button
+              className="btn-coral"
+              disabled={submitting || !answers[q.id]}
+              onClick={submit}
+            >
               {submitting ? "Submitting…" : "Submit post-test"}
             </button>
           ) : (
-            <button className="neon-btn" disabled={!answers[q.id]} onClick={() => setIdx((i) => i + 1)}>
-              Next
+            <button
+              className="btn-primary"
+              disabled={!answers[q.id]}
+              onClick={() => setIdx((i) => i + 1)}
+            >
+              Next →
             </button>
           )}
         </div>

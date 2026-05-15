@@ -3,7 +3,7 @@ import { RequireAuth } from "@/components/RequireAuth";
 import { api } from "@/lib/api";
 import { generateProblem } from "@/lib/convert";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Difficulty = "EASY" | "MEDIUM" | "HARD";
 const TIME_PER_ROUND = 60;
@@ -90,31 +90,51 @@ function Inner() {
     setTimeout(() => setFeedback(null), 350);
   }
 
+  const timeLow = time <= 10;
+
   return (
-    <div className="mx-auto max-w-xl space-y-4">
-      <h1 className="text-2xl font-display font-bold">Conversion Challenge</h1>
-      <p className="opacity-75 text-sm">
-        Solve as many as you can in {TIME_PER_ROUND}s. Streaks add bonus points; one wrong answer breaks the streak.
-      </p>
+    <div className="mx-auto max-w-xl space-y-5">
+      <header>
+        <span className="chip chip-mint">⚡ Conversion Challenge</span>
+        <h1 className="text-2xl md:text-3xl font-display font-black mt-3">
+          Race the clock
+        </h1>
+        <p className="text-sm text-[var(--text-muted)] mt-1">
+          Solve as many as you can in {TIME_PER_ROUND}s. Streaks add bonus points.
+        </p>
+      </header>
 
       <div className="flex flex-wrap gap-2 items-center">
-        <span className="text-sm opacity-70">Difficulty:</span>
+        <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
+          Difficulty:
+        </span>
         {(["EASY", "MEDIUM", "HARD"] as const).map((d) => (
           <button
             key={d}
             disabled={running}
             onClick={() => setDifficulty(d)}
-            className={`chip ${difficulty === d ? "border-cyan-300 bg-cyan-300/10" : ""}`}
+            className={`chip ${
+              difficulty === d ? "chip-mint" : ""
+            } disabled:opacity-60`}
           >
             {d}
           </button>
         ))}
-        <span className="ml-auto chip">⏱ {time}s</span>
-        <span className="chip">Score: {score}</span>
-        <span className="chip">🔥 {streak}</span>
       </div>
 
-      <div className="glass p-6 min-h-[180px] relative overflow-hidden">
+      <div className="flex gap-2">
+        <span className={`chip flex-1 justify-center !py-2 ${timeLow ? "chip-coral" : "chip-sky"}`}>
+          ⏱ {time}s
+        </span>
+        <span className="chip chip-gold flex-1 justify-center !py-2">
+          ⭐ {score}
+        </span>
+        <span className="chip chip-coral flex-1 justify-center !py-2">
+          🔥 {streak}
+        </span>
+      </div>
+
+      <div className="card min-h-[220px] relative overflow-hidden">
         <AnimatePresence mode="wait">
           {running ? (
             <motion.div
@@ -123,25 +143,33 @@ function Inner() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
             >
-              <div className="text-xs uppercase tracking-wider opacity-70">{problem.type.replace(/_/g, " ")}</div>
-              <div className="text-2xl font-mono mt-2">{problem.prompt}</div>
-              <div className="mt-4 flex gap-2">
+              <div className="text-xs uppercase tracking-wider font-bold text-[var(--text-muted)]">
+                {problem.type.replace(/_/g, " ")}
+              </div>
+              <div className="text-3xl font-mono font-extrabold mt-2 break-words">
+                {problem.prompt}
+              </div>
+              <div className="mt-5 flex gap-2">
                 <input
                   ref={inputRef}
-                  className="input font-mono"
+                  className="input font-mono text-lg"
                   value={guess}
                   onChange={(e) => setGuess(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && submit()}
                   placeholder="Your answer"
                 />
-                <button className="neon-btn" onClick={submit}>Submit</button>
+                <button className="btn-primary" onClick={submit}>
+                  Submit
+                </button>
               </div>
               {feedback && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className={`mt-3 inline-block rounded-full px-3 py-1 text-sm ${
-                    feedback === "correct" ? "bg-emerald-400/20 text-emerald-200" : "bg-rose-400/20 text-rose-200"
+                  className={`mt-4 inline-block rounded-full px-3 py-1.5 text-sm font-bold ${
+                    feedback === "correct"
+                      ? "bg-[var(--mint-soft)] text-[var(--mint-dark)]"
+                      : "bg-[var(--coral-soft)] text-[var(--coral-dark)]"
                   }`}
                 >
                   {feedback === "correct" ? "✓ Correct!" : "✗ Try again"}
@@ -149,14 +177,30 @@ function Inner() {
               )}
             </motion.div>
           ) : (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-6">
-              <div className="text-lg opacity-80">
-                {score === 0 ? "Ready when you are." : `Final score: ${score} · Best streak ${maxStreak}`}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-8"
+            >
+              <div className="text-4xl mb-2">{score === 0 ? "🎮" : "🏁"}</div>
+              <div className="text-lg font-bold">
+                {score === 0
+                  ? "Ready when you are."
+                  : `Final score: ${score}`}
               </div>
-              <button className="neon-btn mt-4" onClick={start}>
+              {score > 0 && (
+                <div className="text-sm text-[var(--text-muted)] mt-1">
+                  Best streak: {maxStreak}
+                </div>
+              )}
+              <button className="btn-primary mt-5" onClick={start}>
                 {score === 0 ? "Start" : "Play again"}
               </button>
-              {saved && <p className="mt-2 text-xs opacity-70">Saved to your profile.</p>}
+              {saved && (
+                <p className="mt-3 text-xs text-[var(--text-muted)]">
+                  Saved to your profile.
+                </p>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

@@ -1,30 +1,59 @@
 "use client";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/store/auth";
-import { useRouter } from "next/navigation";
-import { ThemeToggle } from "./ThemeToggle";
+
+const NAV_LINKS = [
+  { href: "/dashboard", label: "Home" },
+  { href: "/lessons", label: "Lessons" },
+  { href: "/games", label: "Games" },
+];
 
 export function NavBar() {
   const { user, logout } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   return (
-    <nav className="sticky top-0 z-40 backdrop-blur bg-black/20 border-b border-white/10">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link href={user ? "/dashboard" : "/"} className="font-display text-xl font-bold tracking-wide">
-          <span className="text-cyan-300">Base</span>
-          <span className="text-fuchsia-400">Quest</span>
+    <nav className="sticky top-0 z-40 bg-white/85 backdrop-blur border-b border-[var(--border)]">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3">
+        <Link
+          href={user ? "/dashboard" : "/"}
+          className="font-display text-2xl font-black tracking-tight"
+          aria-label="BaseQuest home"
+        >
+          <span className="text-[var(--mint)]">Base</span>
+          <span className="text-[var(--coral)]">Quest</span>
+          <span className="text-[var(--gold)]">.</span>
         </Link>
-        <div className="flex items-center gap-2">
+
+        <div className="flex items-center gap-1 sm:gap-2">
           {user ? (
             <>
-              <Link href="/dashboard" className="ghost-btn !px-3 !py-2 text-sm">Dashboard</Link>
-              <Link href="/lessons" className="ghost-btn !px-3 !py-2 text-sm">Lessons</Link>
-              <Link href="/games" className="ghost-btn !px-3 !py-2 text-sm">Games</Link>
-              <Link href="/leaderboard" className="ghost-btn !px-3 !py-2 text-sm">Leaderboard</Link>
-              <ThemeToggle />
+              <div className="hidden md:flex items-center gap-1">
+                {NAV_LINKS.map((l) => {
+                  const active =
+                    pathname === l.href || pathname.startsWith(l.href + "/");
+                  return (
+                    <Link
+                      key={l.href}
+                      href={l.href}
+                      className={`rounded-xl px-3 py-2 text-sm font-bold transition ${
+                        active
+                          ? "bg-[var(--mint-soft)] text-[var(--mint-dark)]"
+                          : "text-[var(--text)] hover:bg-[var(--surface-2)]"
+                      }`}
+                    >
+                      {l.label}
+                    </Link>
+                  );
+                })}
+              </div>
+              <span className="chip chip-gold hidden sm:inline-flex">
+                @{user.username}
+              </span>
               <button
-                className="ghost-btn !px-3 !py-2 text-sm"
+                className="btn-secondary !px-3 !py-2 !text-xs"
                 onClick={() => {
                   logout();
                   router.push("/");
@@ -35,13 +64,38 @@ export function NavBar() {
             </>
           ) : (
             <>
-              <Link href="/login" className="ghost-btn !px-3 !py-2 text-sm">Sign in</Link>
-              <Link href="/register" className="neon-btn !px-3 !py-2 text-sm">Start playing</Link>
-              <ThemeToggle />
+              <Link href="/login" className="btn-secondary !px-3 !py-2 !text-xs">
+                Sign in
+              </Link>
+              <Link href="/register" className="btn-primary !px-3 !py-2 !text-xs">
+                Start playing
+              </Link>
             </>
           )}
         </div>
       </div>
+
+      {user && (
+        <div className="md:hidden mx-auto max-w-6xl px-4 pb-2 flex gap-1 overflow-x-auto">
+          {NAV_LINKS.map((l) => {
+            const active =
+              pathname === l.href || pathname.startsWith(l.href + "/");
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={`rounded-lg px-3 py-1.5 text-xs font-bold whitespace-nowrap ${
+                  active
+                    ? "bg-[var(--mint-soft)] text-[var(--mint-dark)]"
+                    : "text-[var(--text)] bg-[var(--surface-2)]"
+                }`}
+              >
+                {l.label}
+              </Link>
+            );
+          })}
+        </div>
+      )}
     </nav>
   );
 }

@@ -10,7 +10,18 @@ type Progress = {
   quizAttempts: any[];
   gameScores: any[];
   events: any[];
-  summary: { preTestScore: number | null; postTestScore: number | null; improvementPct: number | null };
+  summary: {
+    preTestScore: number | null;
+    postTestScore: number | null;
+    improvementPct: number | null;
+  };
+};
+
+const MODE_LABELS: Record<string, { label: string; chip: string }> = {
+  CONVERSION_CHALLENGE: { label: "Conversion Challenge", chip: "chip-mint" },
+  TOWER_DEFENSE: { label: "Tower Defense", chip: "chip-coral" },
+  MEMORY_MATCH: { label: "Memory Match", chip: "chip-lilac" },
+  SPEED_QUIZ: { label: "Speed Quiz", chip: "chip-sky" },
 };
 
 export default function ResultsPage() {
@@ -31,23 +42,47 @@ function Inner() {
     if (cached) setPostFeedback(JSON.parse(cached));
   }, []);
 
-  if (!data) return <p className="opacity-70">Loading your results…</p>;
+  if (!data) {
+    return (
+      <div className="card animate-pulse text-[var(--text-muted)]">
+        Loading your results…
+      </div>
+    );
+  }
 
   const pre = data.summary.preTestScore;
   const post = data.summary.postTestScore;
   const improve = data.summary.improvementPct;
+  const improveGood = improve != null && improve >= 0;
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-display font-bold">Your Results & Progress</h1>
+    <div className="space-y-8">
+      <header>
+        <span className="chip chip-lilac">📊 Your progress</span>
+        <h1 className="section-title mt-3">Results & growth</h1>
+        <p className="section-sub mt-1">
+          See how far you&apos;ve come since the pre-test.
+        </p>
+      </header>
 
       <section className="grid gap-4 md:grid-cols-3">
-        <Stat label="Pre-test score" value={pre != null ? `${pre}%` : "—"} />
-        <Stat label="Post-test score" value={post != null ? `${post}%` : "—"} />
+        <Stat
+          label="Pre-test score"
+          value={pre != null ? `${pre}%` : "—"}
+          accent="sky"
+        />
+        <Stat
+          label="Post-test score"
+          value={post != null ? `${post}%` : "—"}
+          accent="mint"
+        />
         <Stat
           label="Improvement"
-          value={improve != null ? `${improve > 0 ? "+" : ""}${improve}%` : "—"}
-          accent={improve != null && improve >= 0 ? "good" : "bad"}
+          value={
+            improve != null ? `${improve > 0 ? "+" : ""}${improve}%` : "—"
+          }
+          accent={improveGood ? "mint" : "coral"}
+          arrow={improve == null ? undefined : improveGood ? "up" : "down"}
         />
       </section>
 
@@ -55,76 +90,145 @@ function Inner() {
         <motion.section
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass p-6"
+          className="card"
         >
-          <h2 className="font-display text-lg font-bold">Personalized feedback</h2>
-          <p className="mt-2 text-sm">{postFeedback.feedback}</p>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-2xl">💬</span>
+            <h2 className="font-display text-xl font-extrabold">
+              Personalized feedback
+            </h2>
+          </div>
+          <p className="text-sm leading-relaxed">{postFeedback.feedback}</p>
           {postFeedback.strongestTopic && (
-            <p className="mt-3 text-sm">
-              <span className="opacity-70">Strongest:</span>{" "}
-              <span className="chip">{postFeedback.strongestTopic}</span>
+            <div className="mt-4 flex flex-wrap gap-2 items-center">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                Strongest:
+              </span>
+              <span className="chip chip-mint">
+                {postFeedback.strongestTopic}
+              </span>
               {postFeedback.weakestTopic && (
                 <>
-                  <span className="opacity-70 ml-3">Weakest:</span>{" "}
-                  <span className="chip">{postFeedback.weakestTopic}</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] ml-2">
+                    Weakest:
+                  </span>
+                  <span className="chip chip-coral">
+                    {postFeedback.weakestTopic}
+                  </span>
                 </>
               )}
-            </p>
+            </div>
           )}
         </motion.section>
       )}
 
-      <section className="glass p-6">
-        <h2 className="font-display text-lg font-bold mb-3">Recent game scores</h2>
+      <section className="card">
+        <h2 className="font-display text-xl font-extrabold mb-4">
+          Recent game scores
+        </h2>
         {data.gameScores.length === 0 ? (
-          <p className="opacity-70 text-sm">No games yet. Play one in the Games hub!</p>
+          <div className="rounded-xl bg-[var(--surface-2)] border border-dashed border-[var(--border)] px-4 py-6 text-center">
+            <div className="text-3xl mb-2">🎮</div>
+            <p className="text-sm text-[var(--text-muted)]">
+              No games yet. Play one in the Games hub!
+            </p>
+          </div>
         ) : (
-          <ul className="space-y-1 text-sm font-mono">
-            {data.gameScores.slice(0, 10).map((g, i) => (
-              <li key={i} className="flex justify-between">
-                <span>{g.mode}</span>
-                <span>score {g.score} · +{g.xpEarned} XP</span>
-              </li>
-            ))}
+          <ul className="space-y-2">
+            {data.gameScores.slice(0, 10).map((g, i) => {
+              const meta = MODE_LABELS[g.mode] ?? {
+                label: g.mode,
+                chip: "chip",
+              };
+              return (
+                <li
+                  key={i}
+                  className="flex items-center justify-between gap-3 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] px-3 py-2.5"
+                >
+                  <span className={`chip ${meta.chip}`}>{meta.label}</span>
+                  <span className="text-sm font-mono">
+                    <b>{g.score}</b>{" "}
+                    <span className="text-[var(--text-muted)]">·</span>{" "}
+                    <span className="text-[var(--mint-dark)] font-bold">
+                      +{g.xpEarned} XP
+                    </span>
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>
 
-      <section className="glass p-6">
-        <h2 className="font-display text-lg font-bold mb-3">Lesson progress</h2>
+      <section className="card">
+        <h2 className="font-display text-xl font-extrabold mb-4">
+          Lesson progress
+        </h2>
         {data.lessons.length === 0 ? (
-          <p className="opacity-70 text-sm">No lessons completed yet.</p>
+          <div className="rounded-xl bg-[var(--surface-2)] border border-dashed border-[var(--border)] px-4 py-6 text-center">
+            <div className="text-3xl mb-2">📚</div>
+            <p className="text-sm text-[var(--text-muted)]">
+              No lessons completed yet.
+            </p>
+          </div>
         ) : (
           <ul className="grid gap-2 sm:grid-cols-2 text-sm">
             {data.lessons.map((l, i) => (
-              <li key={i} className="rounded-lg bg-white/5 border border-white/10 px-3 py-2">
-                <div className="font-semibold">{l.lesson?.title ?? l.lessonId}</div>
-                <div className="opacity-70">{l.completed ? "Completed" : `${l.percent}%`}</div>
+              <li
+                key={i}
+                className="rounded-xl bg-[var(--surface-2)] border border-[var(--border)] px-3 py-2.5"
+              >
+                <div className="font-bold">
+                  {l.lesson?.title ?? l.lessonId}
+                </div>
+                <div className="text-xs text-[var(--text-muted)] mt-0.5">
+                  {l.completed ? "✓ Completed" : `${l.percent}%`}
+                </div>
               </li>
             ))}
           </ul>
         )}
       </section>
 
-      <div className="flex gap-2">
-        <Link className="ghost-btn" href="/lessons">Review lessons</Link>
-        <Link className="neon-btn" href="/games">Play more games</Link>
+      <div className="flex gap-2 flex-wrap">
+        <Link className="btn-secondary" href="/lessons">
+          Review lessons
+        </Link>
+        <Link className="btn-primary" href="/games">
+          Play more games
+        </Link>
       </div>
     </div>
   );
 }
 
-function Stat({ label, value, accent }: { label: string; value: string; accent?: "good" | "bad" }) {
-  const color =
-    accent === "good"
-      ? "from-emerald-400 to-cyan-400"
-      : accent === "bad"
-      ? "from-rose-400 to-fuchsia-400"
-      : "from-cyan-400 to-violet-400";
+function Stat({
+  label,
+  value,
+  accent,
+  arrow,
+}: {
+  label: string;
+  value: string;
+  accent: "mint" | "sky" | "coral";
+  arrow?: "up" | "down";
+}) {
+  const colorMap: Record<typeof accent, { bar: string; text: string }> = {
+    mint: { bar: "bg-[var(--mint)]", text: "text-[var(--mint-dark)]" },
+    sky: { bar: "bg-[var(--sky)]", text: "text-[var(--sky-dark)]" },
+    coral: { bar: "bg-[var(--coral)]", text: "text-[var(--coral-dark)]" },
+  };
+  const c = colorMap[accent];
   return (
-    <div className="glass p-5">
-      <div className="text-xs opacity-70">{label}</div>
-      <div className={`mt-1 text-3xl font-display font-bold bg-clip-text text-transparent bg-gradient-to-r ${color}`}>
+    <div className="tile relative">
+      <div className={`tile-accent ${c.bar}`} />
+      <div className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
+        {label}
+      </div>
+      <div className={`mt-2 text-4xl font-display font-black ${c.text}`}>
+        {arrow && (
+          <span className="mr-1">{arrow === "up" ? "↑" : "↓"}</span>
+        )}
         {value}
       </div>
     </div>

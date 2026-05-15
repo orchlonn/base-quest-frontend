@@ -8,7 +8,6 @@ import { useEffect, useMemo, useState } from "react";
 type Card = { id: number; group: number; label: string; sub: string };
 
 function buildDeck(): Card[] {
-  // 6 groups of 3 equivalent values (binary, decimal, hex) → 18 cards
   const numbers = [5, 10, 12, 21, 31, 42];
   const cards: Card[] = [];
   numbers.forEach((n, g) => {
@@ -37,6 +36,7 @@ function Inner() {
   const [matched, setMatched] = useState<Set<number>>(new Set());
   const [moves, setMoves] = useState(0);
   const [saved, setSaved] = useState(false);
+  const [lastMismatch, setLastMismatch] = useState<number[]>([]);
 
   const allMatched = matched.size === cards.length;
   const score = useMemo(() => Math.max(0, 600 - moves * 10), [moves]);
@@ -45,7 +45,12 @@ function Inner() {
     if (allMatched && !saved) {
       api("/game/score", {
         method: "POST",
-        body: JSON.stringify({ mode: "MEMORY_MATCH", score, streakMax: 0, meta: { moves } }),
+        body: JSON.stringify({
+          mode: "MEMORY_MATCH",
+          score,
+          streakMax: 0,
+          meta: { moves },
+        }),
       })
         .then(() => setSaved(true))
         .catch(console.error);
@@ -67,6 +72,9 @@ function Inner() {
           const m = new Set(matched);
           next.forEach((cid) => m.add(cid));
           setMatched(m);
+        } else {
+          setLastMismatch(next);
+          setTimeout(() => setLastMismatch([]), 400);
         }
         setFlipped([]);
       }, 700);
@@ -81,57 +89,101 @@ function Inner() {
     setSaved(false);
   }
 
-  return (
-    <div className="mx-auto max-w-3xl space-y-3">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-display font-bold">Memory Match</h1>
-        <div className="flex gap-2">
-          <span className="chip">Moves: {moves}</span>
-          <span className="chip">Score: {score}</span>
-          <button className="ghost-btn !px-3 !py-2 text-sm" onClick={reset}>Reset</button>
-        </div>
-      </div>
-      <p className="opacity-75 text-sm">Flip 3 cards. Match all three forms (binary, decimal, hex) of the same number.</p>
+  const subLabelClasses: Record<string, string> = {
+    binary: "text-[var(--mint-dark)]",
+    decimal: "text-[var(--sky-dark)]",
+    hex: "text-[var(--lilac-dark)]",
+  };
 
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 mt-4">
-        {cards.map((c) => {
-          const isUp = flipped.includes(c.id) || matched.has(c.id);
-          return (
-            <button
-              key={c.id}
-              onClick={() => click(c.id)}
-              className="relative aspect-[3/4]"
-              aria-label="memory card"
-            >
-              <motion.div
-                animate={{ rotateY: isUp ? 0 : 180 }}
-                transition={{ duration: 0.4 }}
-                className="absolute inset-0 grid place-items-center rounded-xl border border-white/15 bg-white/5"
-                style={{ backfaceVisibility: "hidden" }}
+  return (
+    <div className="mx-auto max-w-3xl space-y-5">
+      <header>
+        <span className="chip chip-lilac">🧠 Memory Match</span>
+        <h1 className="text-2xl md:text-3xl font-display font-black mt-3">
+          Find the trios
+        </h1>
+        <p className="text-sm text-[var(--text-muted)] mt-1">
+          Flip 3 cards. Match all three forms (binary, decimal, hex) of the same number.
+        </p>
+      </header>
+
+      <div className="flex flex-wrap gap-2 items-center">
+        <span className="chip chip-sky !py-2">Moves: {moves}</span>
+        <span className="chip chip-gold !py-2">Score: {score}</span>
+        <button className="btn-secondary ml-auto !px-3 !py-2 !text-xs" onClick={reset}>
+          Reset
+        </button>
+      </div>
+
+      <div className="rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] p-4">
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+          {cards.map((c) => {
+            const isUp = flipped.includes(c.id) || matched.has(c.id);
+            const isMatched = matched.has(c.id);
+            const isMismatch = lastMismatch.includes(c.id);
+            return (
+              <button
+                key={c.id}
+                onClick={() => click(c.id)}
+                className={`relative aspect-[3/4] ${isMismatch ? "animate-shake" : ""}`}
+                aria-label="memory card"
               >
-                <div className="text-center">
-                  <div className="font-mono text-lg">{c.label}</div>
-                  <div className="text-xs opacity-70">{c.sub}</div>
-                </div>
-              </motion.div>
-              <motion.div
-                animate={{ rotateY: isUp ? -180 : 0 }}
-                transition={{ duration: 0.4 }}
-                className="absolute inset-0 rounded-xl border border-white/15 bg-gradient-to-br from-violet-500/40 to-cyan-500/30 grid place-items-center text-2xl font-display"
-                style={{ backfaceVisibility: "hidden" }}
-              >
-                ?
-              </motion.div>
-            </button>
-          );
-        })}
+                <motion.div
+                  animate={{ rotateY: isUp ? 0 : 180 }}
+                  transition={{ duration: 0.4 }}
+                  className={`absolute inset-0 grid place-items-center rounded-2xl bg-white border-2 ${
+                    isMatched
+                      ? "border-[var(--mint)] shadow-press-mint"
+                      : "border-[var(--border)] shadow-card"
+                  }`}
+                  style={{ backfaceVisibility: "hidden" }}
+                >
+                  <div className="text-center">
+                    <div className="font-mono text-lg font-extrabold text-[var(--text)]">
+                      {c.label}
+                    </div>
+                    <div
+                      className={`text-[10px] uppercase font-bold tracking-wider mt-1 ${
+                        subLabelClasses[c.sub] ?? "text-[var(--text-muted)]"
+                      }`}
+                    >
+                      {c.sub}
+                    </div>
+                  </div>
+                </motion.div>
+                <motion.div
+                  animate={{ rotateY: isUp ? -180 : 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="absolute inset-0 rounded-2xl grid place-items-center text-3xl text-white font-display font-black"
+                  style={{
+                    backfaceVisibility: "hidden",
+                    background:
+                      "linear-gradient(135deg, var(--mint) 0%, var(--mint-dark) 100%)",
+                    boxShadow: "0 4px 0 var(--mint-dark)",
+                  }}
+                >
+                  ?
+                </motion.div>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {allMatched && (
-        <div className="glass p-4 text-center mt-4">
-          <div className="text-lg">All matched! Score: <b>{score}</b></div>
-          {saved && <p className="mt-1 text-xs opacity-70">Saved to your profile.</p>}
-          <button className="neon-btn mt-3" onClick={reset}>Play again</button>
+        <div className="card text-center">
+          <div className="text-5xl mb-2">🎉</div>
+          <div className="text-lg font-bold">
+            All matched! Score: <b className="text-[var(--mint-dark)]">{score}</b>
+          </div>
+          {saved && (
+            <p className="mt-1 text-xs text-[var(--text-muted)]">
+              Saved to your profile.
+            </p>
+          )}
+          <button className="btn-primary mt-4" onClick={reset}>
+            Play again
+          </button>
         </div>
       )}
     </div>

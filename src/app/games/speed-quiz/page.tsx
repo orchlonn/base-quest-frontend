@@ -1,9 +1,9 @@
 "use client";
 import { RequireAuth } from "@/components/RequireAuth";
 import { api } from "@/lib/api";
-import { generateProblem, toBase } from "@/lib/convert";
+import { generateProblem } from "@/lib/convert";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 const TIME = 60;
 
@@ -13,16 +13,35 @@ function makeMCQ(): MCQ {
   const p = generateProblem("MEDIUM");
   const choices = new Set<string>([p.answer]);
   while (choices.size < 4) {
-    // Add a plausible distractor
-    const ans = parseInt(p.answer, p.type === "DEC_TO_BIN" || p.type === "HEX_TO_BIN" ? 2 : p.type === "DEC_TO_HEX" ? 16 : 10);
+    const ans = parseInt(
+      p.answer,
+      p.type === "DEC_TO_BIN" || p.type === "HEX_TO_BIN"
+        ? 2
+        : p.type === "DEC_TO_HEX"
+        ? 16
+        : 10
+    );
     const delta = Math.floor(Math.random() * 8) - 4 || 1;
     const distractor = isNaN(ans)
       ? Math.floor(Math.random() * 255).toString()
-      : (Math.max(0, ans + delta)).toString(p.type === "DEC_TO_BIN" || p.type === "HEX_TO_BIN" ? 2 : p.type === "DEC_TO_HEX" ? 16 : 10).toUpperCase();
+      : Math.max(0, ans + delta)
+          .toString(
+            p.type === "DEC_TO_BIN" || p.type === "HEX_TO_BIN"
+              ? 2
+              : p.type === "DEC_TO_HEX"
+              ? 16
+              : 10
+          )
+          .toUpperCase();
     choices.add(distractor);
   }
   const shuffled = [...choices].sort(() => Math.random() - 0.5);
-  return { prompt: p.prompt, answer: p.answer, choices: shuffled, createdAt: Date.now() };
+  return {
+    prompt: p.prompt,
+    answer: p.answer,
+    choices: shuffled,
+    createdAt: Date.now(),
+  };
 }
 
 export default function SpeedQuiz() {
@@ -57,7 +76,11 @@ function Inner() {
     if (!running && score > 0 && !saved && time <= 0) {
       api("/game/score", {
         method: "POST",
-        body: JSON.stringify({ mode: "SPEED_QUIZ", score, streakMax: maxStreak }),
+        body: JSON.stringify({
+          mode: "SPEED_QUIZ",
+          score,
+          streakMax: maxStreak,
+        }),
       })
         .then(() => setSaved(true))
         .catch(console.error);
@@ -79,7 +102,7 @@ function Inner() {
     const ok = choice === q.answer;
     if (ok) {
       const elapsedMs = Date.now() - q.createdAt;
-      const speedBonus = Math.max(0, 8 - Math.floor(elapsedMs / 500)); // up to +8 for fast answers
+      const speedBonus = Math.max(0, 8 - Math.floor(elapsedMs / 500));
       const streakBonus = Math.min(streak, 6);
       setScore((s) => s + 10 + speedBonus + streakBonus);
       const ns = streak + 1;
@@ -94,27 +117,54 @@ function Inner() {
     setTimeout(() => setFlash(null), 200);
   }
 
-  return (
-    <div className="mx-auto max-w-xl space-y-3">
-      <h1 className="text-2xl font-display font-bold">Speed Quiz Arena</h1>
-      <p className="opacity-75 text-sm">{TIME} seconds. Pick the right answer fast for speed bonuses.</p>
+  const timeLow = time <= 10;
 
-      <div className="flex gap-2 items-center">
-        <span className="chip">⏱ {time}s</span>
-        <span className="chip">Score: {score}</span>
-        <span className="chip">🔥 {streak}</span>
+  return (
+    <div className="mx-auto max-w-xl space-y-5">
+      <header>
+        <span className="chip chip-sky">🎯 Speed Quiz Arena</span>
+        <h1 className="text-2xl md:text-3xl font-display font-black mt-3">
+          Quick fingers
+        </h1>
+        <p className="text-sm text-[var(--text-muted)] mt-1">
+          {TIME} seconds. Pick fast for speed bonuses.
+        </p>
+      </header>
+
+      <div className="flex gap-2">
+        <span className={`chip flex-1 justify-center !py-2 ${timeLow ? "chip-coral" : "chip-sky"}`}>
+          ⏱ {time}s
+        </span>
+        <span className="chip chip-gold flex-1 justify-center !py-2">
+          ⭐ {score}
+        </span>
+        <span className="chip chip-coral flex-1 justify-center !py-2">
+          🔥 {streak}
+        </span>
       </div>
 
-      <div className="glass p-6 min-h-[220px] relative">
+      <div className="card min-h-[260px] relative">
         {!running ? (
-          <div className="text-center">
-            <div className="opacity-80">
-              {score === 0 ? "Tap Start when you're ready." : `Time! Final score: ${score} · Best streak ${maxStreak}`}
+          <div className="text-center py-6">
+            <div className="text-4xl mb-2">{score === 0 ? "🎮" : "🏁"}</div>
+            <div className="text-lg font-bold">
+              {score === 0
+                ? "Tap Start when you're ready."
+                : `Time! Final score: ${score}`}
             </div>
-            <button className="neon-btn mt-4" onClick={start}>
+            {score > 0 && (
+              <div className="text-sm text-[var(--text-muted)] mt-1">
+                Best streak: {maxStreak}
+              </div>
+            )}
+            <button className="btn-sky mt-5" onClick={start}>
               {score === 0 ? "Start" : "Play again"}
             </button>
-            {saved && <p className="mt-2 text-xs opacity-70">Saved to your profile.</p>}
+            {saved && (
+              <p className="mt-3 text-xs text-[var(--text-muted)]">
+                Saved to your profile.
+              </p>
+            )}
           </div>
         ) : (
           <AnimatePresence mode="wait">
@@ -125,14 +175,18 @@ function Inner() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
               >
-                <div className="text-xs uppercase tracking-wider opacity-70">Conversion</div>
-                <div className="text-xl font-mono mt-2">{q.prompt}</div>
-                <div className="grid grid-cols-2 gap-2 mt-4">
+                <div className="text-xs uppercase tracking-wider font-bold text-[var(--text-muted)]">
+                  Conversion
+                </div>
+                <div className="text-2xl md:text-3xl font-mono font-extrabold mt-2 break-words">
+                  {q.prompt}
+                </div>
+                <div className="grid grid-cols-2 gap-3 mt-5">
                   {q.choices.map((c) => (
                     <button
                       key={c}
                       onClick={() => pick(c)}
-                      className="rounded-xl border border-white/15 bg-white/5 px-4 py-3 font-mono text-lg hover:border-cyan-300"
+                      className="mc-option font-mono text-lg !text-center"
                     >
                       {c}
                     </button>
@@ -143,9 +197,14 @@ function Inner() {
           </AnimatePresence>
         )}
         {flash && (
-          <div
+          <motion.div
+            initial={{ opacity: 0.4 }}
+            animate={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
             className={`absolute inset-0 pointer-events-none rounded-2xl ${
-              flash === "good" ? "ring-2 ring-emerald-300/60" : "ring-2 ring-rose-400/60"
+              flash === "good"
+                ? "ring-4 ring-[var(--mint)]"
+                : "ring-4 ring-[var(--coral)]"
             }`}
           />
         )}

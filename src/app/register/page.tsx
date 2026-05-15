@@ -34,15 +34,23 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="mx-auto max-w-md mt-10">
-      <div className="glass p-7">
-        <h1 className="text-2xl font-display font-bold">Join BaseQuest</h1>
-        <p className="text-sm opacity-75">Create a student account to start playing.</p>
-        <form className="mt-6 space-y-3" onSubmit={onSubmit}>
+    <div className="mx-auto max-w-md mt-6 md:mt-12">
+      <div className="text-center mb-6">
+        <div className="text-5xl mb-2">🚀</div>
+        <h1 className="text-3xl font-display font-black">Join the quest</h1>
+        <p className="text-sm text-[var(--text-muted)] mt-1">
+          Create a student account to start playing.
+        </p>
+      </div>
+
+      <div className="card">
+        <form className="space-y-4" onSubmit={onSubmit}>
           <div>
-            <label className="text-sm opacity-80">Email</label>
+            <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
+              Email
+            </label>
             <input
-              className="input mt-1"
+              className="input mt-1.5"
               type="email"
               required
               value={email}
@@ -50,40 +58,54 @@ export default function RegisterPage() {
             />
           </div>
           <div>
-            <label className="text-sm opacity-80">Username</label>
+            <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
+              Username
+            </label>
             <input
-              className="input mt-1"
+              className="input mt-1.5"
               required
               minLength={3}
               maxLength={20}
               pattern="[A-Za-z0-9_]+"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              placeholder="letters, numbers, underscore"
             />
           </div>
           <div>
-            <label className="text-sm opacity-80">Password</label>
+            <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
+              Password
+            </label>
             <input
-              className="input mt-1"
+              className="input mt-1.5"
               type="password"
               required
               minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="at least 6 characters"
             />
           </div>
-          {err && <p className="text-sm text-rose-300">{err}</p>}
-          <button className="neon-btn w-full" disabled={loading}>
+          {err && (
+            <div className="rounded-xl border border-[var(--coral)] bg-[var(--coral-soft)] px-3 py-2 text-sm font-semibold text-[var(--coral-dark)]">
+              {err}
+            </div>
+          )}
+          <button className="btn-primary w-full !py-3" disabled={loading}>
             {loading ? "Creating…" : "Create account"}
           </button>
         </form>
-        <p className="mt-4 text-sm opacity-75">
-          Already have an account?{" "}
-          <Link className="underline text-cyan-300" href="/login">
-            Sign in
-          </Link>
-        </p>
       </div>
+
+      <p className="mt-5 text-center text-sm text-[var(--text-muted)]">
+        Already have an account?{" "}
+        <Link
+          className="font-bold text-[var(--mint-dark)] hover:underline"
+          href="/login"
+        >
+          Sign in
+        </Link>
+      </p>
     </div>
   );
 }

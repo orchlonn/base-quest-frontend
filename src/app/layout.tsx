@@ -1,8 +1,28 @@
 import type { Metadata } from "next";
+import { Nunito, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/ThemeProvider";
 import { NavBar } from "@/components/NavBar";
-import { FloatingDigits } from "@/components/FloatingDigits";
+
+const nunito = Nunito({
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "800", "900"],
+  variable: "--font-body",
+  display: "swap",
+});
+
+const nunitoDisplay = Nunito({
+  subsets: ["latin"],
+  weight: ["800", "900"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  variable: "--font-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "BaseQuest — Learn binary, decimal, octal & hex through play",
@@ -12,13 +32,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${nunito.variable} ${nunitoDisplay.variable} ${jetbrains.variable}`}
+    >
       <body>
-        <ThemeProvider>
-          <FloatingDigits />
-          <NavBar />
-          <main className="relative z-10 mx-auto max-w-6xl px-4 py-6">{children}</main>
-        </ThemeProvider>
+        <NavBar />
+        <main className="relative z-10 mx-auto max-w-6xl px-4 py-8">{children}</main>
       </body>
     </html>
   );
