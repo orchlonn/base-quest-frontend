@@ -38,7 +38,7 @@ export default function PostTestPage() {
       }));
       const result = gradePostTest(payload);
       sessionStorage.setItem("bq_posttest_result", JSON.stringify(result));
-      router.push("/results");
+      router.push("/dashboard");
     } catch (e) {
       console.error(e);
       setSubmitting(false);

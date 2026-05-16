@@ -1,17 +1,13 @@
 "use client";
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { motion } from "framer-motion";
 import { toBase } from "@/lib/convert";
 import Link from "next/link";
 import { getLessonBySlug } from "@/lib/data";
-import { markLessonComplete } from "@/lib/local-progress";
 
 export default function LessonDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const lesson = getLessonBySlug(slug);
-  const [percent, setPercent] = useState(0);
-  const [marked, setMarked] = useState(false);
 
   if (!lesson) {
     return (
@@ -24,13 +20,6 @@ export default function LessonDetailPage() {
     );
   }
 
-  function complete() {
-    if (!lesson) return;
-    markLessonComplete({ id: lesson.id, slug: lesson.slug });
-    setPercent(100);
-    setMarked(true);
-  }
-
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
       <div className="space-y-5">
@@ -41,18 +30,6 @@ export default function LessonDetailPage() {
           </h1>
         </div>
 
-        <div
-          className="h-3 rounded-full overflow-hidden border-2 bg-white"
-          style={{ borderColor: "var(--border)" }}
-        >
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${percent}%` }}
-            className="h-full"
-            style={{ background: "var(--mint)" }}
-          />
-        </div>
-
         <article className="card whitespace-pre-wrap font-mono leading-relaxed text-[15px]">
           {lesson.content}
         </article>
@@ -61,9 +38,6 @@ export default function LessonDetailPage() {
           <Link className="btn-secondary" href="/lessons">
             ← All lessons
           </Link>
-          <button className="btn-primary" onClick={complete} disabled={marked}>
-            {marked ? "Marked complete ✓" : "Mark as complete"}
-          </button>
         </div>
       </div>
 
