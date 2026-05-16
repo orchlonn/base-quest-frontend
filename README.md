@@ -1,44 +1,20 @@
 # base-quest-frontend
 
-Frontend for **Base Quest**, a gamified learning app with lessons, mini-games, pre/post tests, and an XP-based progression dashboard. Built with Next.js 14 (App Router), React 18, TypeScript, Tailwind CSS, Zustand, and Framer Motion.
+Frontend for **Base Quest** — a gamified app for learning binary, hex, and decimal conversions through lessons, mini-games, and pre/post tests. Built with Next.js 14 (App Router), React 18, TypeScript, Tailwind CSS, Zustand, and Framer Motion.
+
+All progress, XP, and profile data is stored locally in the browser (`localStorage`). No backend or external API is required.
 
 ## Prerequisites
 
 - **Node.js** 18.17+ (Node 20 LTS recommended)
-- **npm** 9+ (or pnpm / yarn — examples below use npm)
-- A running **Base Quest backend** reachable at the URL you configure in `NEXT_PUBLIC_API_URL` (defaults to `http://localhost:4000`)
+- **npm** 9+ (or pnpm / yarn)
 
 ## Getting started
-
-### 1. Clone and install
 
 ```bash
 git clone <repo-url>
 cd base-quest-frontend
 npm install
-```
-
-### 2. Configure environment variables
-
-Copy the example env file and edit if your backend runs on a different URL:
-
-```bash
-cp .env.example .env.local
-```
-
-`.env.local`:
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:4000
-```
-
-| Variable | Required | Description |
-| --- | --- | --- |
-| `NEXT_PUBLIC_API_URL` | Yes | Base URL of the Base Quest backend API. |
-
-### 3. Run the dev server
-
-```bash
 npm run dev
 ```
 
@@ -60,36 +36,41 @@ npm run build
 npm run start
 ```
 
-The server listens on port 3000 by default. Override with the `PORT` env var or by editing the `start` script in `package.json`.
+The server listens on port 3000 by default. To use a different port:
+
+```bash
+npx next dev -p 3001
+# or
+npx next start -p 3001
+```
 
 ## Project structure
 
 ```
 src/
 ├── app/                # Next.js App Router pages
-│   ├── dashboard/      # Authenticated user dashboard
-│   ├── games/          # Mini-game routes
-│   ├── how-to-play/    # Onboarding / instructions
-│   ├── lessons/        # Lesson content
-│   ├── login/          # Sign in
-│   ├── register/       # Sign up
+│   ├── dashboard/      # Home dashboard with tiles
+│   ├── games/          # Mini-games: conversion-challenge, memory-match,
+│   │                   #   speed-quiz, tower-defense
+│   ├── how-to-play/    # Rules and guide
+│   ├── lessons/        # Lesson list and detail pages
 │   ├── pre-test/       # Diagnostic test
 │   ├── post-test/      # Post-lesson assessment
-│   ├── results/        # Test results
-│   ├── layout.tsx      # Root layout
+│   ├── layout.tsx      # Root layout (NavBar lives here)
 │   └── page.tsx        # Landing page
-├── components/         # Shared UI (NavBar, XPBar, RequireAuth)
-├── lib/                # API client + helpers
-├── store/              # Zustand stores (auth)
-└── styles/             # Global styles
+├── components/         # Shared UI (NavBar, XPBar)
+├── lib/                # convert, data, local-progress, xp helpers
+└── store/              # Zustand profile store
 ```
 
-## Authentication
+## How it works
 
-The auth token is stored in `localStorage` under the key `bq_token` and is sent as a `Bearer` token by the `api()` helper in `src/lib/api.ts`. Routes that require auth wrap their content in the `RequireAuth` component.
+- **No login required.** A local profile is created on first visit and kept in `localStorage`.
+- **Lessons** teach the concepts; **games** reinforce them with XP rewards.
+- **Pre-test** establishes a baseline; **post-test** measures growth.
 
 ## Troubleshooting
 
-- **`Request failed: 401` / API errors** — make sure the backend is running and `NEXT_PUBLIC_API_URL` points to it. Env vars prefixed with `NEXT_PUBLIC_` require a dev server restart after changes.
-- **Port 3000 already in use** — change the port in the `dev` / `start` scripts in `package.json`, or run `npx next dev -p 3001`.
+- **Port 3000 already in use** — run on another port: `npx next dev -p 3001`.
 - **Stale build artifacts** — delete `.next/` and `tsconfig.tsbuildinfo`, then rebuild.
+- **Reset your local progress** — clear the site's `localStorage` from DevTools (Application → Storage).

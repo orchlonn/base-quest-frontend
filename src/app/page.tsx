@@ -47,7 +47,6 @@ export default function Landing() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <span className="chip chip-mint mb-4">For curious students</span>
           <h1 className="text-4xl md:text-6xl font-display font-black leading-[1.05] tracking-tight">
             Master{" "}
             <span className="text-[var(--mint)]">binary</span>,{" "}
