@@ -125,7 +125,7 @@ export default function ConversionChallenge() {
         <AnimatePresence mode="wait">
           {running ? (
             <motion.div
-              key={problem.prompt + Math.random()}
+              key={problem.prompt}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
