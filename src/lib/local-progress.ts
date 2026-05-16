@@ -69,8 +69,9 @@ function defaultState(): ProgressState {
 
 const isBrowser = () => typeof window !== "undefined";
 const listeners = new Set<() => void>();
+let cachedSnapshot: ProgressState | null = null;
 
-function read(): ProgressState {
+function loadFromStorage(): ProgressState {
   if (!isBrowser()) return defaultState();
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
@@ -82,7 +83,14 @@ function read(): ProgressState {
   }
 }
 
+function read(): ProgressState {
+  if (cachedSnapshot) return cachedSnapshot;
+  cachedSnapshot = loadFromStorage();
+  return cachedSnapshot;
+}
+
 function write(next: ProgressState) {
+  cachedSnapshot = next;
   if (!isBrowser()) return;
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   listeners.forEach((fn) => fn());
