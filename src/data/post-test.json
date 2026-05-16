@@ -1,0 +1,14 @@
+[
+  { "id": "POST_01", "prompt": "Convert 1001 (binary) to decimal.", "type": "INPUT", "topic": "BINARY", "difficulty": "EASY", "answer": "9" },
+  { "id": "POST_02", "prompt": "Convert 31 (decimal) to binary.", "type": "INPUT", "topic": "BINARY", "difficulty": "MEDIUM", "answer": "11111" },
+  { "id": "POST_03", "prompt": "What is 0x1F in decimal?", "type": "MULTIPLE_CHOICE", "topic": "HEXADECIMAL", "difficulty": "MEDIUM", "choices": ["15", "31", "32", "33"], "answer": "31" },
+  { "id": "POST_04", "prompt": "Convert 100 (decimal) to hex.", "type": "INPUT", "topic": "HEXADECIMAL", "difficulty": "MEDIUM", "answer": "64" },
+  { "id": "POST_05", "prompt": "What is 11010 (binary) in decimal?", "type": "INPUT", "topic": "BINARY", "difficulty": "MEDIUM", "answer": "26" },
+  { "id": "POST_06", "prompt": "Convert 75 (octal) to decimal.", "type": "INPUT", "topic": "OCTAL", "difficulty": "MEDIUM", "answer": "61" },
+  { "id": "POST_07", "prompt": "Which is binary for hex C?", "type": "MULTIPLE_CHOICE", "topic": "CONVERSION", "difficulty": "EASY", "choices": ["1010", "1011", "1100", "1101"], "answer": "1100" },
+  { "id": "POST_08", "prompt": "What is 200 (decimal) in hex?", "type": "INPUT", "topic": "HEXADECIMAL", "difficulty": "HARD", "answer": "C8" },
+  { "id": "POST_09", "prompt": "What is 101101 (binary) in hex?", "type": "INPUT", "topic": "CONVERSION", "difficulty": "HARD", "answer": "2D" },
+  { "id": "POST_10", "prompt": "How many distinct values can 1 byte (8 bits) represent?", "type": "MULTIPLE_CHOICE", "topic": "BINARY", "difficulty": "EASY", "choices": ["128", "256", "512", "1024"], "answer": "256" },
+  { "id": "POST_11", "prompt": "Convert 0b1110 to decimal.", "type": "INPUT", "topic": "BINARY", "difficulty": "EASY", "answer": "14" },
+  { "id": "POST_12", "prompt": "Convert FF (hex) to binary.", "type": "INPUT", "topic": "CONVERSION", "difficulty": "HARD", "answer": "11111111" }
+]

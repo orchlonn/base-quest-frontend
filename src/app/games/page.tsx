@@ -1,8 +1,7 @@
 "use client";
 import Link from "next/link";
-import { RequireAuth } from "@/components/RequireAuth";
-import { api } from "@/lib/api";
-import { useEffect, useState } from "react";
+import { useProgress } from "@/store/profile";
+import { hasTakenPreTest } from "@/lib/local-progress";
 
 type Accent = "mint" | "coral" | "lilac" | "sky";
 
@@ -58,20 +57,8 @@ const ACCENT_CTA: Record<Accent, string> = {
 };
 
 export default function GamesHub() {
-  return (
-    <RequireAuth>
-      <Inner />
-    </RequireAuth>
-  );
-}
-
-function Inner() {
-  const [locked, setLocked] = useState<boolean | null>(null);
-  useEffect(() => {
-    api<{ summary: { preTestScore: number | null } }>("/student/progress")
-      .then((p) => setLocked(p.summary.preTestScore == null))
-      .catch(() => setLocked(false));
-  }, []);
+  const progress = useProgress();
+  const locked = !hasTakenPreTest(progress);
 
   return (
     <div className="space-y-8">

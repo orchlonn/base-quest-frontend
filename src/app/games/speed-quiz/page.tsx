@@ -1,6 +1,5 @@
 "use client";
-import { RequireAuth } from "@/components/RequireAuth";
-import { api } from "@/lib/api";
+import { recordGameScore } from "@/lib/local-progress";
 import { generateProblem } from "@/lib/convert";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -45,14 +44,6 @@ function makeMCQ(): MCQ {
 }
 
 export default function SpeedQuiz() {
-  return (
-    <RequireAuth>
-      <Inner />
-    </RequireAuth>
-  );
-}
-
-function Inner() {
   const [running, setRunning] = useState(false);
   const [time, setTime] = useState(TIME);
   const [q, setQ] = useState<MCQ | null>(null);
@@ -74,16 +65,12 @@ function Inner() {
 
   useEffect(() => {
     if (!running && score > 0 && !saved && time <= 0) {
-      api("/game/score", {
-        method: "POST",
-        body: JSON.stringify({
-          mode: "SPEED_QUIZ",
-          score,
-          streakMax: maxStreak,
-        }),
-      })
-        .then(() => setSaved(true))
-        .catch(console.error);
+      recordGameScore({
+        mode: "SPEED_QUIZ",
+        score,
+        streakMax: maxStreak,
+      });
+      setSaved(true);
     }
   }, [running, score, maxStreak, time, saved]);
 

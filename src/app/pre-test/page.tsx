@@ -1,37 +1,19 @@
 "use client";
-import { RequireAuth } from "@/components/RequireAuth";
-import { api } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-
-type Question = {
-  id: string;
-  prompt: string;
-  type: "MULTIPLE_CHOICE" | "INPUT";
-  choices?: string[];
-  topic: string;
-};
+import { pickPreTest, type PublicQuestion } from "@/lib/data";
+import { gradePreTest } from "@/lib/local-progress";
 
 export default function PreTestPage() {
-  return (
-    <RequireAuth>
-      <Inner />
-    </RequireAuth>
-  );
-}
-
-function Inner() {
   const router = useRouter();
-  const [questions, setQuestions] = useState<Question[] | null>(null);
+  const [questions, setQuestions] = useState<PublicQuestion[] | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [idx, setIdx] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    api<Question[]>("/questions/pre-test", { auth: false })
-      .then(setQuestions)
-      .catch(console.error);
+    setQuestions(pickPreTest(10));
   }, []);
 
   if (!questions) {
@@ -47,19 +29,14 @@ function Inner() {
   const done = idx >= questions.length - 1;
   const progress = ((idx + 1) / questions.length) * 100;
 
-  async function submit() {
+  function submit() {
     setSubmitting(true);
     try {
-      const payload = {
-        answers: Object.entries(answers).map(([questionId, value]) => ({
-          questionId,
-          value,
-        })),
-      };
-      const result = await api("/quiz/pre-test/submit", {
-        method: "POST",
-        body: JSON.stringify(payload),
-      });
+      const payload = Object.entries(answers).map(([questionId, value]) => ({
+        questionId,
+        value,
+      }));
+      const result = gradePreTest(payload);
       sessionStorage.setItem("bq_pretest_result", JSON.stringify(result));
       router.push("/lessons?from=pre-test");
     } catch (e) {

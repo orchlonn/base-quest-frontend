@@ -1,0 +1,14 @@
+[
+  { "id": "PRE_01", "prompt": "What is 1010 in decimal?", "type": "MULTIPLE_CHOICE", "topic": "BINARY", "difficulty": "EASY", "choices": ["8", "10", "12", "14"], "answer": "10", "explanation": "1×8 + 0×4 + 1×2 + 0×1 = 10" },
+  { "id": "PRE_02", "prompt": "Convert 13 (decimal) to binary.", "type": "INPUT", "topic": "BINARY", "difficulty": "EASY", "answer": "1101" },
+  { "id": "PRE_03", "prompt": "What is 0xFF in decimal?", "type": "MULTIPLE_CHOICE", "topic": "HEXADECIMAL", "difficulty": "MEDIUM", "choices": ["127", "200", "255", "256"], "answer": "255" },
+  { "id": "PRE_04", "prompt": "Convert 42 (decimal) to hex.", "type": "INPUT", "topic": "HEXADECIMAL", "difficulty": "MEDIUM", "answer": "2A" },
+  { "id": "PRE_05", "prompt": "What is 11111111 in decimal?", "type": "INPUT", "topic": "BINARY", "difficulty": "MEDIUM", "answer": "255" },
+  { "id": "PRE_06", "prompt": "Which is the binary equivalent of decimal 7?", "type": "MULTIPLE_CHOICE", "topic": "BINARY", "difficulty": "EASY", "choices": ["110", "111", "101", "011"], "answer": "111" },
+  { "id": "PRE_07", "prompt": "How many bits make one hex digit?", "type": "MULTIPLE_CHOICE", "topic": "HEXADECIMAL", "difficulty": "EASY", "choices": ["2", "3", "4", "8"], "answer": "4" },
+  { "id": "PRE_08", "prompt": "What is 17 (octal) in decimal?", "type": "INPUT", "topic": "OCTAL", "difficulty": "MEDIUM", "answer": "15" },
+  { "id": "PRE_09", "prompt": "Convert 1100 (binary) to hex.", "type": "INPUT", "topic": "CONVERSION", "difficulty": "MEDIUM", "answer": "C" },
+  { "id": "PRE_10", "prompt": "Which base does each digit have 16 possible values?", "type": "MULTIPLE_CHOICE", "topic": "DECIMAL", "difficulty": "EASY", "choices": ["Binary", "Octal", "Decimal", "Hexadecimal"], "answer": "Hexadecimal" },
+  { "id": "PRE_11", "prompt": "Convert 25 (decimal) to binary.", "type": "INPUT", "topic": "BINARY", "difficulty": "MEDIUM", "answer": "11001" },
+  { "id": "PRE_12", "prompt": "What is A3 (hex) in decimal?", "type": "INPUT", "topic": "HEXADECIMAL", "difficulty": "HARD", "answer": "163" }
+]

@@ -1,17 +1,6 @@
 "use client";
-import { RequireAuth } from "@/components/RequireAuth";
-import { api } from "@/lib/api";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-
-type Lesson = {
-  id: string;
-  slug: string;
-  title: string;
-  topic: string;
-  description: string;
-  order: number;
-};
+import { LESSONS } from "@/lib/data";
 
 type Accent = "mint" | "sky" | "coral" | "lilac" | "gold";
 
@@ -21,6 +10,7 @@ const TOPIC_THEME: Record<string, { accent: Accent; glyph: string }> = {
   OCTAL: { accent: "coral", glyph: "10₈" },
   HEX: { accent: "lilac", glyph: "F₁₆" },
   HEXADECIMAL: { accent: "lilac", glyph: "F₁₆" },
+  CONVERSION: { accent: "gold", glyph: "↔" },
 };
 
 const ACCENT_BG: Record<Accent, string> = {
@@ -49,21 +39,6 @@ const ACCENT_CTA: Record<Accent, string> = {
 
 export default function LessonsPage() {
   return (
-    <RequireAuth>
-      <Inner />
-    </RequireAuth>
-  );
-}
-
-function Inner() {
-  const [lessons, setLessons] = useState<Lesson[] | null>(null);
-  useEffect(() => {
-    api<Lesson[]>("/lessons", { auth: false })
-      .then(setLessons)
-      .catch(console.error);
-  }, []);
-
-  return (
     <div className="space-y-8">
       <header>
         <span className="chip chip-mint">Lessons</span>
@@ -74,7 +49,7 @@ function Inner() {
       </header>
 
       <div className="grid gap-4 md:grid-cols-2">
-        {lessons?.map((l) => {
+        {LESSONS.map((l) => {
           const theme = TOPIC_THEME[l.topic.toUpperCase()] ?? {
             accent: "mint" as Accent,
             glyph: "•",
@@ -112,11 +87,6 @@ function Inner() {
             </Link>
           );
         })}
-        {!lessons && (
-          <div className="card animate-pulse text-[var(--text-muted)]">
-            Loading lessons…
-          </div>
-        )}
       </div>
 
       <div className="rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] p-6 flex flex-wrap gap-4 items-center justify-between">

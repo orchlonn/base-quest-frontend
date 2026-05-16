@@ -1,6 +1,5 @@
 "use client";
-import { RequireAuth } from "@/components/RequireAuth";
-import { api } from "@/lib/api";
+import { recordGameScore } from "@/lib/local-progress";
 import { generateProblem } from "@/lib/convert";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
@@ -13,14 +12,6 @@ type Enemy = {
 };
 
 export default function TowerDefense() {
-  return (
-    <RequireAuth>
-      <Inner />
-    </RequireAuth>
-  );
-}
-
-function Inner() {
   const [running, setRunning] = useState(false);
   const [baseHp, setBaseHp] = useState(100);
   const [score, setScore] = useState(0);
@@ -79,17 +70,13 @@ function Inner() {
 
   useEffect(() => {
     if (!running && score > 0 && !saved && baseHp <= 0) {
-      api("/game/score", {
-        method: "POST",
-        body: JSON.stringify({
-          mode: "TOWER_DEFENSE",
-          score,
-          streakMax: maxStreak,
-          meta: { baseHpRemaining: baseHp },
-        }),
-      })
-        .then(() => setSaved(true))
-        .catch(console.error);
+      recordGameScore({
+        mode: "TOWER_DEFENSE",
+        score,
+        streakMax: maxStreak,
+        meta: { baseHpRemaining: baseHp },
+      });
+      setSaved(true);
     }
   }, [running, score, maxStreak, saved, baseHp]);
 

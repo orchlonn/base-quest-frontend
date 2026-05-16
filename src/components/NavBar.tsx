@@ -1,24 +1,22 @@
 "use client";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useAuth } from "@/store/auth";
+import { usePathname } from "next/navigation";
 
 const NAV_LINKS = [
   { href: "/dashboard", label: "Home" },
   { href: "/lessons", label: "Lessons" },
   { href: "/games", label: "Games" },
+  { href: "/results", label: "Results" },
 ];
 
 export function NavBar() {
-  const { user, logout } = useAuth();
-  const router = useRouter();
   const pathname = usePathname();
 
   return (
     <nav className="sticky top-0 z-40 bg-white/85 backdrop-blur border-b border-[var(--border)]">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3">
         <Link
-          href={user ? "/dashboard" : "/"}
+          href="/"
           className="font-display text-2xl font-black tracking-tight"
           aria-label="BaseQuest home"
         >
@@ -27,56 +25,7 @@ export function NavBar() {
           <span className="text-[var(--gold)]">.</span>
         </Link>
 
-        <div className="flex items-center gap-1 sm:gap-2">
-          {user ? (
-            <>
-              <div className="hidden md:flex items-center gap-1">
-                {NAV_LINKS.map((l) => {
-                  const active =
-                    pathname === l.href || pathname.startsWith(l.href + "/");
-                  return (
-                    <Link
-                      key={l.href}
-                      href={l.href}
-                      className={`rounded-xl px-3 py-2 text-sm font-bold transition ${
-                        active
-                          ? "bg-[var(--mint-soft)] text-[var(--mint-dark)]"
-                          : "text-[var(--text)] hover:bg-[var(--surface-2)]"
-                      }`}
-                    >
-                      {l.label}
-                    </Link>
-                  );
-                })}
-              </div>
-              <span className="chip chip-gold hidden sm:inline-flex">
-                @{user.username}
-              </span>
-              <button
-                className="btn-secondary !px-3 !py-2 !text-xs"
-                onClick={() => {
-                  logout();
-                  router.push("/");
-                }}
-              >
-                Sign out
-              </button>
-            </>
-          ) : (
-            <>
-              <Link href="/login" className="btn-secondary !px-3 !py-2 !text-xs">
-                Sign in
-              </Link>
-              <Link href="/register" className="btn-primary !px-3 !py-2 !text-xs">
-                Start playing
-              </Link>
-            </>
-          )}
-        </div>
-      </div>
-
-      {user && (
-        <div className="md:hidden mx-auto max-w-6xl px-4 pb-2 flex gap-1 overflow-x-auto">
+        <div className="hidden md:flex items-center gap-1">
           {NAV_LINKS.map((l) => {
             const active =
               pathname === l.href || pathname.startsWith(l.href + "/");
@@ -84,10 +33,10 @@ export function NavBar() {
               <Link
                 key={l.href}
                 href={l.href}
-                className={`rounded-lg px-3 py-1.5 text-xs font-bold whitespace-nowrap ${
+                className={`rounded-xl px-3 py-2 text-sm font-bold transition ${
                   active
                     ? "bg-[var(--mint-soft)] text-[var(--mint-dark)]"
-                    : "text-[var(--text)] bg-[var(--surface-2)]"
+                    : "text-[var(--text)] hover:bg-[var(--surface-2)]"
                 }`}
               >
                 {l.label}
@@ -95,7 +44,27 @@ export function NavBar() {
             );
           })}
         </div>
-      )}
+      </div>
+
+      <div className="md:hidden mx-auto max-w-6xl px-4 pb-2 flex gap-1 overflow-x-auto">
+        {NAV_LINKS.map((l) => {
+          const active =
+            pathname === l.href || pathname.startsWith(l.href + "/");
+          return (
+            <Link
+              key={l.href}
+              href={l.href}
+              className={`rounded-lg px-3 py-1.5 text-xs font-bold whitespace-nowrap ${
+                active
+                  ? "bg-[var(--mint-soft)] text-[var(--mint-dark)]"
+                  : "text-[var(--text)] bg-[var(--surface-2)]"
+              }`}
+            >
+              {l.label}
+            </Link>
+          );
+        })}
+      </div>
     </nav>
   );
 }

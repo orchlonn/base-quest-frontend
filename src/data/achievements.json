@@ -1,0 +1,6 @@
+[
+  { "code": "FIRST_GAME", "title": "First Steps", "description": "Play your first game.", "iconKey": "sparkles", "xpReward": 25 },
+  { "code": "STREAK_5", "title": "Hot Streak", "description": "Hit a 5-answer streak.", "iconKey": "flame", "xpReward": 50 },
+  { "code": "STREAK_10", "title": "On Fire", "description": "Hit a 10-answer streak.", "iconKey": "fire", "xpReward": 100 },
+  { "code": "SCORE_500", "title": "High Roller", "description": "Reach 500 in a single game.", "iconKey": "trophy", "xpReward": 150 }
+]

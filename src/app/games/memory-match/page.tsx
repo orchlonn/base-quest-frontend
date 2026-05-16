@@ -1,6 +1,5 @@
 "use client";
-import { RequireAuth } from "@/components/RequireAuth";
-import { api } from "@/lib/api";
+import { recordGameScore } from "@/lib/local-progress";
 import { toBase } from "@/lib/convert";
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
@@ -23,14 +22,6 @@ function buildDeck(): Card[] {
 }
 
 export default function MemoryMatch() {
-  return (
-    <RequireAuth>
-      <Inner />
-    </RequireAuth>
-  );
-}
-
-function Inner() {
   const [cards, setCards] = useState<Card[]>(() => buildDeck());
   const [flipped, setFlipped] = useState<number[]>([]);
   const [matched, setMatched] = useState<Set<number>>(new Set());
@@ -43,17 +34,13 @@ function Inner() {
 
   useEffect(() => {
     if (allMatched && !saved) {
-      api("/game/score", {
-        method: "POST",
-        body: JSON.stringify({
-          mode: "MEMORY_MATCH",
-          score,
-          streakMax: 0,
-          meta: { moves },
-        }),
-      })
-        .then(() => setSaved(true))
-        .catch(console.error);
+      recordGameScore({
+        mode: "MEMORY_MATCH",
+        score,
+        streakMax: 0,
+        meta: { moves },
+      });
+      setSaved(true);
     }
   }, [allMatched, score, moves, saved]);
 

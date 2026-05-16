@@ -1,21 +1,10 @@
 "use client";
-import { RequireAuth } from "@/components/RequireAuth";
-import { api } from "@/lib/api";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-
-type Progress = {
-  lessons: any[];
-  quizAttempts: any[];
-  gameScores: any[];
-  events: any[];
-  summary: {
-    preTestScore: number | null;
-    postTestScore: number | null;
-    improvementPct: number | null;
-  };
-};
+import { LESSONS } from "@/lib/data";
+import { useProgress } from "@/store/profile";
+import type { PostTestResult } from "@/lib/local-progress";
 
 const MODE_LABELS: Record<string, { label: string; chip: string }> = {
   CONVERSION_CHALLENGE: { label: "Conversion Challenge", chip: "chip-mint" },
@@ -25,34 +14,41 @@ const MODE_LABELS: Record<string, { label: string; chip: string }> = {
 };
 
 export default function ResultsPage() {
-  return (
-    <RequireAuth>
-      <Inner />
-    </RequireAuth>
-  );
-}
-
-function Inner() {
-  const [data, setData] = useState<Progress | null>(null);
-  const [postFeedback, setPostFeedback] = useState<any | null>(null);
+  const progress = useProgress();
+  const [postFeedback, setPostFeedback] = useState<PostTestResult | null>(null);
 
   useEffect(() => {
-    api<Progress>("/student/progress").then(setData).catch(console.error);
     const cached = sessionStorage.getItem("bq_posttest_result");
-    if (cached) setPostFeedback(JSON.parse(cached));
+    if (cached) {
+      try {
+        setPostFeedback(JSON.parse(cached));
+      } catch {}
+    }
   }, []);
 
-  if (!data) {
-    return (
-      <div className="card animate-pulse text-[var(--text-muted)]">
-        Loading your results…
-      </div>
-    );
-  }
+  const summary = useMemo(() => {
+    const pre = progress.quizAttempts.find((a) => a.kind === "PRE_TEST");
+    const post = progress.quizAttempts.find((a) => a.kind === "POST_TEST");
+    const improvement =
+      pre && post
+        ? Math.round(((post.score - pre.score) / Math.max(pre.score, 1)) * 100)
+        : null;
+    return {
+      preTestScore: pre?.score ?? null,
+      postTestScore: post?.score ?? null,
+      improvementPct: improvement,
+    };
+  }, [progress.quizAttempts]);
 
-  const pre = data.summary.preTestScore;
-  const post = data.summary.postTestScore;
-  const improve = data.summary.improvementPct;
+  const lessonsByTitle = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const l of LESSONS) map.set(l.id, l.title);
+    return map;
+  }, []);
+
+  const pre = summary.preTestScore;
+  const post = summary.postTestScore;
+  const improve = summary.improvementPct;
   const improveGood = improve != null && improve >= 0;
 
   return (
@@ -126,7 +122,7 @@ function Inner() {
         <h2 className="font-display text-xl font-extrabold mb-4">
           Recent game scores
         </h2>
-        {data.gameScores.length === 0 ? (
+        {progress.gameScores.length === 0 ? (
           <div className="rounded-xl bg-[var(--surface-2)] border border-dashed border-[var(--border)] px-4 py-6 text-center">
             <div className="text-3xl mb-2">🎮</div>
             <p className="text-sm text-[var(--text-muted)]">
@@ -135,14 +131,14 @@ function Inner() {
           </div>
         ) : (
           <ul className="space-y-2">
-            {data.gameScores.slice(0, 10).map((g, i) => {
+            {progress.gameScores.slice(0, 10).map((g) => {
               const meta = MODE_LABELS[g.mode] ?? {
                 label: g.mode,
                 chip: "chip",
               };
               return (
                 <li
-                  key={i}
+                  key={g.id}
                   className="flex items-center justify-between gap-3 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] px-3 py-2.5"
                 >
                   <span className={`chip ${meta.chip}`}>{meta.label}</span>
@@ -164,7 +160,7 @@ function Inner() {
         <h2 className="font-display text-xl font-extrabold mb-4">
           Lesson progress
         </h2>
-        {data.lessons.length === 0 ? (
+        {progress.lessonProgress.length === 0 ? (
           <div className="rounded-xl bg-[var(--surface-2)] border border-dashed border-[var(--border)] px-4 py-6 text-center">
             <div className="text-3xl mb-2">📚</div>
             <p className="text-sm text-[var(--text-muted)]">
@@ -173,13 +169,13 @@ function Inner() {
           </div>
         ) : (
           <ul className="grid gap-2 sm:grid-cols-2 text-sm">
-            {data.lessons.map((l, i) => (
+            {progress.lessonProgress.map((l) => (
               <li
-                key={i}
+                key={l.lessonId}
                 className="rounded-xl bg-[var(--surface-2)] border border-[var(--border)] px-3 py-2.5"
               >
                 <div className="font-bold">
-                  {l.lesson?.title ?? l.lessonId}
+                  {lessonsByTitle.get(l.lessonId) ?? l.slug}
                 </div>
                 <div className="text-xs text-[var(--text-muted)] mt-0.5">
                   {l.completed ? "✓ Completed" : `${l.percent}%`}

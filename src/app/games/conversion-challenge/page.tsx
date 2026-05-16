@@ -1,6 +1,5 @@
 "use client";
-import { RequireAuth } from "@/components/RequireAuth";
-import { api } from "@/lib/api";
+import { recordGameScore } from "@/lib/local-progress";
 import { generateProblem } from "@/lib/convert";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
@@ -9,14 +8,6 @@ type Difficulty = "EASY" | "MEDIUM" | "HARD";
 const TIME_PER_ROUND = 60;
 
 export default function ConversionChallenge() {
-  return (
-    <RequireAuth>
-      <Inner />
-    </RequireAuth>
-  );
-}
-
-function Inner() {
   const [difficulty, setDifficulty] = useState<Difficulty>("EASY");
   const [running, setRunning] = useState(false);
   const [problem, setProblem] = useState(() => generateProblem("EASY"));
@@ -45,17 +36,13 @@ function Inner() {
 
   useEffect(() => {
     if (!running && score > 0 && !saved) {
-      api("/game/score", {
-        method: "POST",
-        body: JSON.stringify({
-          mode: "CONVERSION_CHALLENGE",
-          score,
-          streakMax: maxStreak,
-          meta: { difficulty },
-        }),
-      })
-        .then(() => setSaved(true))
-        .catch(console.error);
+      recordGameScore({
+        mode: "CONVERSION_CHALLENGE",
+        score,
+        streakMax: maxStreak,
+        meta: { difficulty },
+      });
+      setSaved(true);
     }
   }, [running, score, maxStreak, difficulty, saved]);
 

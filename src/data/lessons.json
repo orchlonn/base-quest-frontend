@@ -1,0 +1,47 @@
+[
+  {
+    "id": "lesson-intro-number-systems",
+    "slug": "intro-number-systems",
+    "title": "Intro to Number Systems",
+    "topic": "DECIMAL",
+    "order": 1,
+    "description": "What positional number systems are and why computers use base-2.",
+    "content": "# Intro to Number Systems\n\nNumber systems represent numbers using a fixed set of digits.\n- **Decimal (Base 10)** — digits 0–9. The system we use every day.\n- **Binary (Base 2)** — digits 0 and 1. Used by computers.\n- **Octal (Base 8)** — digits 0–7.\n- **Hexadecimal (Base 16)** — digits 0–9 and A–F.\n\nEach position in a number has a place value that is a power of the base."
+  },
+  {
+    "id": "lesson-binary-basics",
+    "slug": "binary-basics",
+    "title": "Binary Basics",
+    "topic": "BINARY",
+    "order": 2,
+    "description": "Reading binary, place values, and small conversions.",
+    "content": "# Binary Basics\n\nBinary uses only 0 and 1. Each position is a power of 2.\n\nExample: `1011` (binary)\n- 1 × 2³ = 8\n- 0 × 2² = 0\n- 1 × 2¹ = 2\n- 1 × 2⁰ = 1\n\nTotal = **11** in decimal.\n\n**Practice:** What is `1101` in decimal? (Answer: 13)"
+  },
+  {
+    "id": "lesson-hex-fundamentals",
+    "slug": "hex-fundamentals",
+    "title": "Hex Fundamentals",
+    "topic": "HEXADECIMAL",
+    "order": 3,
+    "description": "Hex digits 0–F and quick conversions to binary.",
+    "content": "# Hex Fundamentals\n\nHex uses 0–9 plus A=10, B=11, C=12, D=13, E=14, F=15.\n\nA neat trick: each hex digit maps to exactly 4 binary bits.\n\nExample: `2F` (hex)\n- 2 = 0010\n- F = 1111\n- Combined → `00101111` = 47 in decimal."
+  },
+  {
+    "id": "lesson-octal-overview",
+    "slug": "octal-overview",
+    "title": "Octal Overview",
+    "topic": "OCTAL",
+    "order": 4,
+    "description": "Octal digits and grouping binary by threes.",
+    "content": "# Octal Overview\n\nOctal uses digits 0–7. Each octal digit maps to **3** binary bits.\n\nExample: `52` (octal)\n- 5 = 101\n- 2 = 010\n- Combined → `101010` = 42 in decimal."
+  },
+  {
+    "id": "lesson-conversion-mastery",
+    "slug": "conversion-mastery",
+    "title": "Conversion Mastery",
+    "topic": "CONVERSION",
+    "order": 5,
+    "description": "Step-by-step methods for converting between any two bases.",
+    "content": "# Conversion Mastery\n\n**Decimal → Binary (division method):**\n1. Divide the number by 2.\n2. Write down the remainder.\n3. Repeat with the quotient until it's 0.\n4. Read the remainders **bottom to top**.\n\n**Decimal → Hex:** same method but divide by 16.\n\n**Binary → Hex:** group bits into 4s from the right.\n\n**Hex → Binary:** expand each hex digit into 4 bits."
+  }
+]

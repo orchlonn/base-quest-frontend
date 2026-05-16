@@ -1,0 +1,6 @@
+[
+  { "code": "BEGINNER_BIT", "title": "Beginner Bit", "description": "Welcome to BaseQuest.", "rankCode": "BEGINNER_BIT", "minXp": 0, "iconKey": "bit" },
+  { "code": "BINARY_EXPLORER", "title": "Binary Explorer", "description": "250 XP earned.", "rankCode": "BINARY_EXPLORER", "minXp": 250, "iconKey": "binary" },
+  { "code": "HEX_HERO", "title": "Hex Hero", "description": "750 XP earned.", "rankCode": "HEX_HERO", "minXp": 750, "iconKey": "hex" },
+  { "code": "CONVERSION_WIZARD", "title": "Conversion Wizard", "description": "2000 XP earned.", "rankCode": "CONVERSION_WIZARD", "minXp": 2000, "iconKey": "wizard" }
+]

@@ -61,15 +61,15 @@ export default function Landing() {
             your growth.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
-            <Link href="/register" className="btn-primary">
+            <Link href="/pre-test" className="btn-primary">
               Start the quest →
             </Link>
-            <Link href="/login" className="btn-secondary">
-              I have an account
+            <Link href="/dashboard" className="btn-secondary">
+              Go to dashboard
             </Link>
           </div>
           <p className="mt-4 text-sm text-[var(--text-muted)]">
-            For students. No admins, no clutter — just play.
+            No accounts. Your progress is saved on this device.
           </p>
         </motion.div>
 
@@ -132,11 +132,11 @@ export default function Landing() {
           Ready to level up?
         </h2>
         <p className="mt-2 text-[var(--text-muted)]">
-          Create an account, take the pre-test, and the games unlock.
+          Take the pre-test and the games unlock.
         </p>
         <div className="mt-6">
-          <Link href="/register" className="btn-primary">
-            Create my account
+          <Link href="/pre-test" className="btn-primary">
+            Start the pre-test
           </Link>
         </div>
       </section>

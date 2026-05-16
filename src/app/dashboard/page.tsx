@@ -1,20 +1,10 @@
 "use client";
-import { RequireAuth } from "@/components/RequireAuth";
 import { XPBar } from "@/components/XPBar";
-import { api } from "@/lib/api";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-
-type Profile = {
-  username: string;
-  xp: number;
-  level: number;
-  streakDays: number;
-  rankCode: string;
-  xpRange: { current: number; next: number; level: number };
-  achievements: { code: string; title: string; iconKey: string; description: string }[];
-};
+import { useProfile, useProgress, setName } from "@/store/profile";
+import { hasTakenPreTest } from "@/lib/local-progress";
 
 const RANK_TITLES: Record<string, string> = {
   BEGINNER_BIT: "Beginner Bit",
@@ -49,35 +39,11 @@ const ACCENT_CTA: Record<Tile["accent"], string> = {
 };
 
 export default function DashboardPage() {
-  return (
-    <RequireAuth>
-      <Inner />
-    </RequireAuth>
-  );
-}
-
-function Inner() {
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [hasPreTest, setHasPreTest] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      const [p, progress] = await Promise.all([
-        api<Profile>("/student/profile"),
-        api<{ summary: { preTestScore: number | null } }>("/student/progress"),
-      ]);
-      setProfile(p);
-      setHasPreTest(progress.summary.preTestScore != null);
-    })().catch(console.error);
-  }, []);
-
-  if (!profile) {
-    return (
-      <div className="card animate-pulse">
-        <p className="text-[var(--text-muted)]">Loading your profile…</p>
-      </div>
-    );
-  }
+  const profile = useProfile();
+  const progress = useProgress();
+  const hasPreTest = hasTakenPreTest(progress);
+  const [editing, setEditing] = useState(false);
+  const [draftName, setDraftName] = useState(profile.username);
 
   const tiles: Tile[] = [
     {
@@ -124,6 +90,11 @@ function Inner() {
     },
   ];
 
+  function saveName() {
+    setName(draftName);
+    setEditing(false);
+  }
+
   return (
     <div className="space-y-8">
       <motion.div
@@ -133,9 +104,43 @@ function Inner() {
       >
         <div className="flex-1">
           <div className="text-sm text-[var(--text-muted)] font-bold">Welcome back,</div>
-          <h1 className="text-3xl md:text-4xl font-display font-black mt-1">
-            @{profile.username}
-          </h1>
+          {editing ? (
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              <input
+                className="input !py-2 max-w-[200px]"
+                value={draftName}
+                maxLength={20}
+                autoFocus
+                onChange={(e) => setDraftName(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && saveName()}
+              />
+              <button className="btn-primary !px-3 !py-2 !text-xs" onClick={saveName}>
+                Save
+              </button>
+              <button
+                className="btn-secondary !px-3 !py-2 !text-xs"
+                onClick={() => {
+                  setDraftName(profile.username);
+                  setEditing(false);
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <h1 className="text-3xl md:text-4xl font-display font-black mt-1 flex items-center gap-3">
+              @{profile.username}
+              <button
+                className="text-xs font-bold text-[var(--text-muted)] hover:text-[var(--text)] underline"
+                onClick={() => {
+                  setDraftName(profile.username);
+                  setEditing(true);
+                }}
+              >
+                ✏ change
+              </button>
+            </h1>
+          )}
           <div className="mt-3 flex flex-wrap gap-2">
             <span className="chip chip-lilac">
               🎖️ {RANK_TITLES[profile.rankCode] ?? profile.rankCode}

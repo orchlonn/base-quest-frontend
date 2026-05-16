@@ -1,48 +1,32 @@
 "use client";
-import { RequireAuth } from "@/components/RequireAuth";
-import { api } from "@/lib/api";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { toBase } from "@/lib/convert";
 import Link from "next/link";
-
-type Lesson = { id: string; title: string; content: string; topic: string };
+import { getLessonBySlug } from "@/lib/data";
+import { markLessonComplete } from "@/lib/local-progress";
 
 export default function LessonDetailPage() {
-  return (
-    <RequireAuth>
-      <Inner />
-    </RequireAuth>
-  );
-}
-
-function Inner() {
   const { slug } = useParams<{ slug: string }>();
-  const [lesson, setLesson] = useState<Lesson | null>(null);
+  const lesson = getLessonBySlug(slug);
   const [percent, setPercent] = useState(0);
   const [marked, setMarked] = useState(false);
 
-  useEffect(() => {
-    api<Lesson>(`/lessons/${slug}`, { auth: false })
-      .then(setLesson)
-      .catch(console.error);
-  }, [slug]);
-
   if (!lesson) {
     return (
-      <div className="card animate-pulse text-[var(--text-muted)]">
-        Loading lesson…
+      <div className="card text-[var(--text-muted)]">
+        Lesson not found.{" "}
+        <Link href="/lessons" className="font-bold text-[var(--mint-dark)] hover:underline">
+          Back to lessons
+        </Link>
       </div>
     );
   }
 
-  async function markComplete() {
+  function complete() {
     if (!lesson) return;
-    await api("/lessons/progress", {
-      method: "POST",
-      body: JSON.stringify({ lessonId: lesson.id, completed: true, percent: 100 }),
-    });
+    markLessonComplete({ id: lesson.id, slug: lesson.slug });
     setPercent(100);
     setMarked(true);
   }
@@ -77,7 +61,7 @@ function Inner() {
           <Link className="btn-secondary" href="/lessons">
             ← All lessons
           </Link>
-          <button className="btn-primary" onClick={markComplete} disabled={marked}>
+          <button className="btn-primary" onClick={complete} disabled={marked}>
             {marked ? "Marked complete ✓" : "Mark as complete"}
           </button>
         </div>
