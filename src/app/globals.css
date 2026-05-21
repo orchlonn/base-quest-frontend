@@ -85,12 +85,13 @@ body {
   /* ── Buttons ──────────────────────────────────────────── */
   .btn {
     @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5
-      font-semibold uppercase tracking-wide text-sm select-none
+      font-extrabold uppercase tracking-wide text-base select-none
       transition-transform duration-100 disabled:opacity-50 disabled:cursor-not-allowed;
   }
   .btn-primary {
-    @apply btn text-white;
-    background: var(--mint);
+    @apply btn;
+    color: #173006;
+    background: linear-gradient(180deg, #72e018 0%, var(--mint) 100%);
     box-shadow: 0 4px 0 var(--mint-dark);
   }
   .btn-primary:hover:not(:disabled) {
@@ -179,7 +180,7 @@ body {
 
   /* ── Chips ────────────────────────────────────────────── */
   .chip {
-    @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold;
+    @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-bold;
     background: var(--surface-2);
     color: var(--text);
     border: 1px solid var(--border);
@@ -196,6 +197,7 @@ body {
     color: var(--text);
   }
   .section-sub {
+    @apply text-base md:text-lg;
     color: var(--text-muted);
   }
 

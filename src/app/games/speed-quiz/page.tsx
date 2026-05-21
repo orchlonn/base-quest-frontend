@@ -12,25 +12,12 @@ function makeMCQ(): MCQ {
   const p = generateProblem("MEDIUM");
   const choices = new Set<string>([p.answer]);
   while (choices.size < 4) {
-    const ans = parseInt(
-      p.answer,
-      p.type === "DEC_TO_BIN" || p.type === "HEX_TO_BIN"
-        ? 2
-        : p.type === "DEC_TO_HEX"
-        ? 16
-        : 10
-    );
+    const ans = parseInt(p.answer, p.targetBase);
     const delta = Math.floor(Math.random() * 8) - 4 || 1;
     const distractor = isNaN(ans)
       ? Math.floor(Math.random() * 255).toString()
       : Math.max(0, ans + delta)
-          .toString(
-            p.type === "DEC_TO_BIN" || p.type === "HEX_TO_BIN"
-              ? 2
-              : p.type === "DEC_TO_HEX"
-              ? 16
-              : 10
-          )
+          .toString(p.targetBase)
           .toUpperCase();
     choices.add(distractor);
   }
@@ -113,7 +100,7 @@ export default function SpeedQuiz() {
         <h1 className="text-2xl md:text-3xl font-display font-black mt-3">
           Quick fingers
         </h1>
-        <p className="text-sm text-[var(--text-muted)] mt-1">
+        <p className="text-base text-[var(--text-muted)] mt-1">
           {TIME} seconds. Pick fast for speed bonuses.
         </p>
       </header>
@@ -140,7 +127,7 @@ export default function SpeedQuiz() {
                 : `Time! Final score: ${score}`}
             </div>
             {score > 0 && (
-              <div className="text-sm text-[var(--text-muted)] mt-1">
+              <div className="text-base text-[var(--text-muted)] mt-1">
                 Best streak: {maxStreak}
               </div>
             )}
@@ -148,7 +135,7 @@ export default function SpeedQuiz() {
               {score === 0 ? "Start" : "Play again"}
             </button>
             {saved && (
-              <p className="mt-3 text-xs text-[var(--text-muted)]">
+              <p className="mt-3 text-sm text-[var(--text-muted)]">
                 Saved to your profile.
               </p>
             )}
@@ -162,7 +149,7 @@ export default function SpeedQuiz() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
               >
-                <div className="text-xs uppercase tracking-wider font-bold text-[var(--text-muted)]">
+                <div className="text-sm uppercase tracking-wider font-bold text-[var(--text-muted)]">
                   Conversion
                 </div>
                 <div className="text-2xl md:text-3xl font-mono font-extrabold mt-2 break-words">

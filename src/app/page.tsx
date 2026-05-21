@@ -1,6 +1,8 @@
 "use client";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useMemo, useState } from "react";
+import { BASE_LABELS, convertBase, type Base } from "@/lib/convert";
 
 const features = [
   {
@@ -24,11 +26,13 @@ const features = [
 ] as const;
 
 const previewRows = [
-  { from: "11010110", to: "0xD6", chip: "chip-sky" },
-  { from: "42", to: "0b101010", chip: "chip-coral" },
-  { from: "0xFF", to: "255", chip: "chip-mint" },
-  { from: "0o17", to: "0xF", chip: "chip-gold" },
-];
+  { value: "11010110", fromBase: 2, toBase: 16, chip: "chip-sky" },
+  { value: "42", fromBase: 10, toBase: 2, chip: "chip-coral" },
+  { value: "FF", fromBase: 16, toBase: 10, chip: "chip-mint" },
+  { value: "17", fromBase: 8, toBase: 16, chip: "chip-gold" },
+] as const;
+
+const baseOptions: Base[] = [10, 2, 8, 16];
 
 const colorMap: Record<string, { bar: string; chip: string }> = {
   mint: { bar: "bg-[var(--mint)]", chip: "chip-mint" },
@@ -61,13 +65,13 @@ export default function Landing() {
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link href="/pre-test" className="btn-primary">
-              Start the quest →
+              Start with the pre-test
             </Link>
             <Link href="/dashboard" className="btn-secondary">
               Go to dashboard
             </Link>
           </div>
-          <p className="mt-4 text-sm text-[var(--text-muted)]">
+          <p className="mt-4 text-base text-[var(--text-muted)]">
             No accounts. Your progress is saved on this device.
           </p>
         </motion.div>
@@ -78,25 +82,7 @@ export default function Landing() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="card relative"
         >
-          <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-2xl bg-gradient-to-r from-[var(--mint)] via-[var(--sky)] to-[var(--coral)]" />
-          <div className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-3">
-            live conversions
-          </div>
-          <div className="grid gap-2 text-sm">
-            {previewRows.map((row, i) => (
-              <motion.div
-                key={i}
-                animate={{ y: [0, -3, 0] }}
-                transition={{ duration: 3 + i * 0.3, repeat: Infinity, ease: "easeInOut" }}
-                className="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3"
-              >
-                <span className={`chip ${row.chip}`}>convert</span>
-                <span className="font-mono text-base font-bold text-[var(--text)]">
-                  {row.from} <span className="text-[var(--text-muted)]">→</span> {row.to}
-                </span>
-              </motion.div>
-            ))}
-          </div>
+          <LiveConversionPanel />
         </motion.div>
       </section>
 
@@ -118,7 +104,7 @@ export default function Landing() {
                 <div className={`tile-accent ${c.bar}`} />
                 <div className="text-3xl">{f.icon}</div>
                 <h3 className="mt-3 font-display font-extrabold text-lg">{f.title}</h3>
-                <p className="mt-1 text-sm text-[var(--text-muted)]">{f.body}</p>
+                <p className="mt-1 text-base text-[var(--text-muted)]">{f.body}</p>
               </motion.div>
             );
           })}
@@ -140,5 +126,106 @@ export default function Landing() {
         </div>
       </section>
     </div>
+  );
+}
+
+function LiveConversionPanel() {
+  const [value, setValue] = useState("42");
+  const [fromBase, setFromBase] = useState<Base>(10);
+  const [toBase, setToBase] = useState<Base>(2);
+  const result = useMemo(
+    () => convertBase(value, fromBase, toBase),
+    [value, fromBase, toBase]
+  );
+  const cleanedValue = value.trim() || "this value";
+
+  return (
+    <>
+      <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-2xl bg-gradient-to-r from-[var(--mint)] via-[var(--sky)] to-[var(--coral)]" />
+      <div className="text-sm font-bold uppercase tracking-wider text-[var(--text-muted)] mb-3">
+        Live conversion
+      </div>
+      <p className="text-base text-[var(--text-muted)]">
+        Convert this value from one base to another.
+      </p>
+
+      <div className="mt-4 grid gap-3">
+        <label className="grid gap-1 text-sm font-bold text-[var(--text-muted)]">
+          Value to convert
+          <input
+            className="input font-mono text-lg"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="Example: 101010"
+          />
+        </label>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <BaseSelect
+            label="Convert from"
+            value={fromBase}
+            onChange={setFromBase}
+          />
+          <BaseSelect label="Convert to" value={toBase} onChange={setToBase} />
+        </div>
+
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+          <div className="text-sm font-extrabold text-[var(--text-muted)]">
+            Convert {cleanedValue} from {BASE_LABELS[fromBase]} to{" "}
+            {BASE_LABELS[toBase]}
+          </div>
+          <div className="mt-2 font-mono text-3xl font-black break-words">
+            {result ?? "Invalid input"}
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {previewRows.map((row) => {
+            const converted = convertBase(row.value, row.fromBase, row.toBase);
+            return (
+              <button
+                key={`${row.value}-${row.fromBase}-${row.toBase}`}
+                className={`chip ${row.chip}`}
+                onClick={() => {
+                  setValue(row.value);
+                  setFromBase(row.fromBase);
+                  setToBase(row.toBase);
+                }}
+              >
+                {row.value} {BASE_LABELS[row.fromBase]} to {converted ?? "?"}{" "}
+                {BASE_LABELS[row.toBase]}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function BaseSelect({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: Base;
+  onChange: (base: Base) => void;
+}) {
+  return (
+    <label className="grid gap-1 text-sm font-bold text-[var(--text-muted)]">
+      {label}
+      <select
+        className="input text-base font-bold"
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value) as Base)}
+      >
+        {baseOptions.map((base) => (
+          <option key={base} value={base}>
+            {BASE_LABELS[base]} (base {base})
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }

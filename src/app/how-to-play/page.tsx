@@ -20,7 +20,7 @@ export default function HowToPlayPage() {
       </header>
 
       <Section title="Game rules" icon="📋" accent="sky">
-        <ul className="list-disc list-inside text-sm space-y-1.5">
+        <ul className="list-disc list-inside text-base space-y-1.5">
           <li>Take the pre-test once before unlocking the full game.</li>
           <li>Open lessons and play any of the four game modes.</li>
           <li>
@@ -30,7 +30,7 @@ export default function HowToPlayPage() {
       </Section>
 
       <Section title="Scoring & XP" icon="⭐" accent="gold">
-        <ul className="list-disc list-inside text-sm space-y-1.5">
+        <ul className="list-disc list-inside text-base space-y-1.5">
           <li>Each correct answer in a game adds points to your score.</li>
           <li>You earn 1 XP per score point (capped at 500 XP per game).</li>
           <li>Post-test awards 15 XP per correct answer.</li>
@@ -38,7 +38,7 @@ export default function HowToPlayPage() {
       </Section>
 
       <Section title="Levels" icon="🎚" accent="mint">
-        <p className="text-sm leading-relaxed">
+        <p className="text-base leading-relaxed">
           Levels scale quadratically: level <em>n</em> requires{" "}
           <code className="font-mono bg-[var(--surface-2)] px-1.5 py-0.5 rounded">
             100·n²
@@ -49,7 +49,7 @@ export default function HowToPlayPage() {
       </Section>
 
       <Section title="Streaks" icon="🔥" accent="coral">
-        <ul className="list-disc list-inside text-sm space-y-1.5">
+        <ul className="list-disc list-inside text-base space-y-1.5">
           <li>A streak is consecutive correct answers in one round.</li>
           <li>Higher streaks unlock badges (5 → Hot Streak, 10 → On Fire).</li>
           <li>One wrong answer resets the streak — but not your score.</li>
@@ -57,7 +57,7 @@ export default function HowToPlayPage() {
       </Section>
 
       <Section title="Badges & ranks" icon="🎖️" accent="lilac">
-        <ul className="text-sm space-y-2">
+        <ul className="text-base space-y-2">
           <li className="flex items-center justify-between">
             <span>
               <strong>Beginner Bit</strong>
@@ -86,7 +86,7 @@ export default function HowToPlayPage() {
       </Section>
 
       <Section title="Game mode rules" icon="🎮" accent="mint">
-        <div className="space-y-3 text-sm">
+        <div className="space-y-3 text-base">
           <p>
             <strong className="text-[var(--mint-dark)]">
               Conversion Challenge:

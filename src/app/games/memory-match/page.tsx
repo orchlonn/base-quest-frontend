@@ -89,7 +89,7 @@ export default function MemoryMatch() {
         <h1 className="text-2xl md:text-3xl font-display font-black mt-3">
           Find the trios
         </h1>
-        <p className="text-sm text-[var(--text-muted)] mt-1">
+        <p className="text-base text-[var(--text-muted)] mt-1">
           Flip 3 cards. Match all three forms (binary, decimal, hex) of the same number.
         </p>
       </header>
@@ -97,7 +97,7 @@ export default function MemoryMatch() {
       <div className="flex flex-wrap gap-2 items-center">
         <span className="chip chip-sky !py-2">Moves: {moves}</span>
         <span className="chip chip-gold !py-2">Score: {score}</span>
-        <button className="btn-secondary ml-auto !px-3 !py-2 !text-xs" onClick={reset}>
+        <button className="btn-secondary ml-auto !px-3 !py-2 !text-sm" onClick={reset}>
           Reset
         </button>
       </div>
@@ -130,7 +130,7 @@ export default function MemoryMatch() {
                       {c.label}
                     </div>
                     <div
-                      className={`text-[10px] uppercase font-bold tracking-wider mt-1 ${
+                      className={`text-sm uppercase font-bold tracking-wider mt-1 ${
                         subLabelClasses[c.sub] ?? "text-[var(--text-muted)]"
                       }`}
                     >
@@ -164,7 +164,7 @@ export default function MemoryMatch() {
             All matched! Score: <b className="text-[var(--mint-dark)]">{score}</b>
           </div>
           {saved && (
-            <p className="mt-1 text-xs text-[var(--text-muted)]">
+            <p className="mt-1 text-sm text-[var(--text-muted)]">
               Saved to your profile.
             </p>
           )}

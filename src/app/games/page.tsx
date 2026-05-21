@@ -75,7 +75,7 @@ export default function GamesHub() {
             <div className="font-bold text-[var(--coral-dark)]">
               Finish the pre-test first
             </div>
-            <div className="text-sm text-[var(--coral-dark)]/80">
+            <div className="text-base text-[var(--coral-dark)]/80">
               It unlocks the full game experience.
             </div>
           </div>
@@ -97,9 +97,9 @@ export default function GamesHub() {
               </div>
               <div className="flex-1">
                 <h3 className="font-display font-extrabold text-lg">{m.title}</h3>
-                <p className="text-sm text-[var(--text-muted)] mt-1">{m.body}</p>
+                <p className="text-base text-[var(--text-muted)] mt-1">{m.body}</p>
                 <div
-                  className={`mt-3 text-sm font-bold ${ACCENT_CTA[m.accent]} group-hover:underline`}
+                  className={`mt-3 text-base font-bold ${ACCENT_CTA[m.accent]} group-hover:underline`}
                 >
                   Play →
                 </div>

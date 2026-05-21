@@ -5,8 +5,8 @@
     "title": "Intro to Number Systems",
     "topic": "DECIMAL",
     "order": 1,
-    "description": "What positional number systems are and why computers use base-2.",
-    "content": "# Intro to Number Systems\n\nNumber systems represent numbers using a fixed set of digits.\n- **Decimal (Base 10)** — digits 0–9. The system we use every day.\n- **Binary (Base 2)** — digits 0 and 1. Used by computers.\n- **Octal (Base 8)** — digits 0–7.\n- **Hexadecimal (Base 16)** — digits 0–9 and A–F.\n\nEach position in a number has a place value that is a power of the base."
+    "description": "What positional number systems are, why computers use base-2, and how to read conversion prompts.",
+    "content": "# Intro to Number Systems\n\nA number system is a way to write quantity using a limited set of symbols. The base tells you how many symbols are available before the next place value begins.\n\n## The big idea\n\nDecimal is base 10, so it uses digits 0-9. Binary is base 2, so it uses only 0 and 1. Octal is base 8, so it uses 0-7. Hexadecimal is base 16, so it uses 0-9 plus A-F.\n\nEvery position has a value. Moving one place left multiplies by the base. In decimal, 527 means 5 hundreds, 2 tens, and 7 ones. In binary, 1011 means 1 eight, 0 fours, 1 two, and 1 one.\n\n## How to read conversion prompts\n\nWhen you see `Convert 42 from decimal to binary`, identify three things:\n\n1. The value: `42`\n2. The source base: decimal\n3. The target base: binary\n\nThen choose a method. If the source is decimal, repeated division usually works best. If the target is decimal, use place values. If binary is converting to hex or octal, use groups of bits.\n\n## Why computers care\n\nComputer circuits are built from switches. A switch can be off or on, which maps naturally to 0 and 1. Binary is the computer's native language, while hex and octal are compact ways for humans to read long binary values."
   },
   {
     "id": "lesson-binary-basics",
@@ -14,8 +14,8 @@
     "title": "Binary Basics",
     "topic": "BINARY",
     "order": 2,
-    "description": "Reading binary, place values, and small conversions.",
-    "content": "# Binary Basics\n\nBinary uses only 0 and 1. Each position is a power of 2.\n\nExample: `1011` (binary)\n- 1 × 2³ = 8\n- 0 × 2² = 0\n- 1 × 2¹ = 2\n- 1 × 2⁰ = 1\n\nTotal = **11** in decimal.\n\n**Practice:** What is `1101` in decimal? (Answer: 13)"
+    "description": "Reading binary, place values, and decimal conversions.",
+    "content": "# Binary Basics\n\nBinary uses only 0 and 1. Each position is a power of 2, starting at 1 on the far right.\n\n## Place values\n\nFor a 4-bit number, the place values are `8, 4, 2, 1`. For an 8-bit number, they are `128, 64, 32, 16, 8, 4, 2, 1`.\n\nExample: `1011` in binary\n\n- 1 x 8 = 8\n- 0 x 4 = 0\n- 1 x 2 = 2\n- 1 x 1 = 1\n\nTotal: `8 + 0 + 2 + 1 = 11`, so `1011` binary equals `11` decimal.\n\n## Decimal to binary\n\nTo convert decimal to binary, repeatedly divide by 2 and record the remainder. Read the remainders from bottom to top.\n\nExample: `13` decimal\n\n- 13 / 2 = 6 remainder 1\n- 6 / 2 = 3 remainder 0\n- 3 / 2 = 1 remainder 1\n- 1 / 2 = 0 remainder 1\n\nRead upward: `1101`.\n\nPractice: What is `1101` in decimal? Answer: `13`."
   },
   {
     "id": "lesson-hex-fundamentals",
@@ -23,8 +23,8 @@
     "title": "Hex Fundamentals",
     "topic": "HEXADECIMAL",
     "order": 3,
-    "description": "Hex digits 0–F and quick conversions to binary.",
-    "content": "# Hex Fundamentals\n\nHex uses 0–9 plus A=10, B=11, C=12, D=13, E=14, F=15.\n\nA neat trick: each hex digit maps to exactly 4 binary bits.\n\nExample: `2F` (hex)\n- 2 = 0010\n- F = 1111\n- Combined → `00101111` = 47 in decimal."
+    "description": "Hex digits 0-F, decimal values, and quick conversions to binary.",
+    "content": "# Hex Fundamentals\n\nHexadecimal is base 16. It uses digits 0-9, then letters A-F for values 10-15.\n\n## Hex digit values\n\nA = 10, B = 11, C = 12, D = 13, E = 14, F = 15.\n\nHex is popular because one hex digit maps to exactly 4 binary bits. That makes long binary values much easier to read.\n\n## Hex to binary\n\nExample: `2F` in hex\n\n- `2` becomes `0010`\n- `F` becomes `1111`\n- Together: `00101111`\n\n## Hex to decimal\n\nUse place values, just like decimal and binary. In `2F`, the left digit is worth 16s and the right digit is worth 1s.\n\n`2F = 2 x 16 + 15 x 1 = 47` decimal.\n\n## Decimal to hex\n\nRepeatedly divide by 16 and record remainders. If a remainder is 10-15, write A-F."
   },
   {
     "id": "lesson-octal-overview",
@@ -32,8 +32,8 @@
     "title": "Octal Overview",
     "topic": "OCTAL",
     "order": 4,
-    "description": "Octal digits and grouping binary by threes.",
-    "content": "# Octal Overview\n\nOctal uses digits 0–7. Each octal digit maps to **3** binary bits.\n\nExample: `52` (octal)\n- 5 = 101\n- 2 = 010\n- Combined → `101010` = 42 in decimal."
+    "description": "Octal digits, decimal place values, and grouping binary by threes.",
+    "content": "# Octal Overview\n\nOctal is base 8, so it uses digits 0-7. You will not see 8 or 9 inside a valid octal number.\n\n## Why octal works with binary\n\nOne octal digit maps to exactly 3 binary bits because `2 x 2 x 2 = 8`.\n\nExample: `52` in octal\n\n- `5` becomes `101`\n- `2` becomes `010`\n- Together: `101010`\n\nThat binary value is `42` in decimal.\n\n## Octal to decimal\n\nUse base-8 place values. In `52`, the left digit is worth 8s and the right digit is worth 1s.\n\n`52 = 5 x 8 + 2 x 1 = 42` decimal.\n\n## Decimal to octal\n\nRepeatedly divide by 8 and read the remainders from bottom to top."
   },
   {
     "id": "lesson-conversion-mastery",
@@ -42,6 +42,6 @@
     "topic": "CONVERSION",
     "order": 5,
     "description": "Step-by-step methods for converting between any two bases.",
-    "content": "# Conversion Mastery\n\n**Decimal → Binary (division method):**\n1. Divide the number by 2.\n2. Write down the remainder.\n3. Repeat with the quotient until it's 0.\n4. Read the remainders **bottom to top**.\n\n**Decimal → Hex:** same method but divide by 16.\n\n**Binary → Hex:** group bits into 4s from the right.\n\n**Hex → Binary:** expand each hex digit into 4 bits."
+    "content": "# Conversion Mastery\n\nMost conversions use one of three patterns: place values, repeated division, or binary grouping.\n\n## Pattern 1: Any base to decimal\n\nMultiply each digit by its place value, then add.\n\nExample: `1011` binary\n\n- 1 x 8 = 8\n- 0 x 4 = 0\n- 1 x 2 = 2\n- 1 x 1 = 1\n\nTotal: `11` decimal.\n\n## Pattern 2: Decimal to any base\n\nRepeatedly divide by the target base. Write each remainder. Read the remainders from bottom to top.\n\nUse divide by 2 for binary, divide by 8 for octal, and divide by 16 for hex.\n\n## Pattern 3: Binary to octal or hex\n\nGroup bits from the right.\n\n- Binary to octal: groups of 3 bits\n- Binary to hex: groups of 4 bits\n- Octal to binary: each digit becomes 3 bits\n- Hex to binary: each digit becomes 4 bits\n\n## General rule for any conversion\n\nIf you are stuck, use decimal as the bridge: source base -> decimal -> target base.\n\nExample: `52` octal to hex\n\n1. `52` octal = `42` decimal\n2. `42` decimal = `2A` hex\n\nSo `52` octal equals `2A` hex."
   }
 ]

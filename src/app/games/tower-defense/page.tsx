@@ -121,7 +121,7 @@ export default function TowerDefense() {
         <h1 className="text-2xl md:text-3xl font-display font-black mt-3">
           Defend your base
         </h1>
-        <p className="text-sm text-[var(--text-muted)] mt-1">
+        <p className="text-base text-[var(--text-muted)] mt-1">
           Type the answer to the closest enemy. Wrong answers cost 5 HP.
         </p>
       </header>
@@ -179,7 +179,7 @@ export default function TowerDefense() {
               animate={{ opacity: 1, left: `${Math.min(85, e.progress)}%` }}
               exit={{ opacity: 0, scale: 0.4 }}
               transition={{ ease: "linear", duration: 0.6 }}
-              className={`absolute top-1/2 -translate-y-1/2 rounded-xl px-3 py-2 font-mono text-sm font-bold border-2 bg-white ${
+              className={`absolute top-1/2 max-w-[260px] -translate-y-1/2 rounded-xl px-3 py-2 font-mono text-base font-bold leading-tight border-2 bg-white ${
                 target?.id === e.id
                   ? "border-[var(--coral)] text-[var(--coral-dark)] shadow-press-coral"
                   : "border-[var(--border)] text-[var(--text)] shadow-card"
@@ -205,7 +205,7 @@ export default function TowerDefense() {
 
       {/* Targeting input */}
       <div className="card">
-        <div className="text-xs uppercase tracking-wider font-bold text-[var(--text-muted)]">
+        <div className="text-sm uppercase tracking-wider font-bold text-[var(--text-muted)]">
           Target
         </div>
         <div className="font-mono text-xl font-bold mt-1">
@@ -230,11 +230,11 @@ export default function TowerDefense() {
         <div className="card text-center">
           <div className="text-5xl mb-2">💥</div>
           <div className="text-lg font-bold">Base destroyed!</div>
-          <div className="text-sm text-[var(--text-muted)] mt-1">
+          <div className="text-base text-[var(--text-muted)] mt-1">
             Final score: <b className="text-[var(--text)]">{score}</b> · Best streak {maxStreak}
           </div>
           {saved && (
-            <p className="mt-2 text-xs text-[var(--text-muted)]">Saved to your profile.</p>
+            <p className="mt-2 text-sm text-[var(--text-muted)]">Saved to your profile.</p>
           )}
         </div>
       )}

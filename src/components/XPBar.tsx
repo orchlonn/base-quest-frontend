@@ -19,13 +19,13 @@ export function XPBar({
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-1.5">
-        <span className="inline-flex items-center gap-2 text-sm font-extrabold text-[var(--text)]">
-          <span className="inline-flex items-center justify-center h-6 w-6 rounded-full text-white text-xs bg-[var(--gold)]">
+        <span className="inline-flex items-center gap-2 text-base font-extrabold text-[var(--text)]">
+          <span className="inline-flex items-center justify-center h-6 w-6 rounded-full text-[var(--text)] text-sm bg-[var(--gold)]">
             {level}
           </span>
           Level {level}
         </span>
-        <span className="text-xs font-bold text-[var(--text-muted)]">
+        <span className="text-sm font-bold text-[var(--text-muted)]">
           {xp} / {next} XP
         </span>
       </div>

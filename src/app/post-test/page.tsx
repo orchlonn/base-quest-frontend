@@ -49,7 +49,7 @@ export default function PostTestPage() {
     <div className="mx-auto max-w-2xl">
       <div className="flex items-center justify-between mb-2">
         <span className="chip chip-coral">Post-test</span>
-        <span className="text-sm font-bold text-[var(--text-muted)]">
+        <span className="text-base font-bold text-[var(--text-muted)]">
           Question {idx + 1} of {questions.length}
         </span>
       </div>

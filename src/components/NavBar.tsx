@@ -32,7 +32,7 @@ export function NavBar() {
               <Link
                 key={l.href}
                 href={l.href}
-                className={`rounded-xl px-3 py-2 text-sm font-bold transition ${
+                className={`rounded-xl px-3 py-2 text-base font-bold transition ${
                   active
                     ? "bg-[var(--mint-soft)] text-[var(--mint-dark)]"
                     : "text-[var(--text)] hover:bg-[var(--surface-2)]"
@@ -53,7 +53,7 @@ export function NavBar() {
             <Link
               key={l.href}
               href={l.href}
-              className={`rounded-lg px-3 py-1.5 text-xs font-bold whitespace-nowrap ${
+              className={`rounded-lg px-3 py-1.5 text-sm font-bold whitespace-nowrap ${
                 active
                   ? "bg-[var(--mint-soft)] text-[var(--mint-dark)]"
                   : "text-[var(--text)] bg-[var(--surface-2)]"

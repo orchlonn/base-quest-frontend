@@ -69,11 +69,11 @@ export default function LessonsPage() {
                   <h3 className="mt-3 font-display font-extrabold text-xl">
                     {l.title}
                   </h3>
-                  <p className="mt-2 text-sm text-[var(--text-muted)]">
+                  <p className="mt-2 text-base text-[var(--text-muted)]">
                     {l.description}
                   </p>
                   <div
-                    className={`mt-4 text-sm font-bold ${ACCENT_CTA[theme.accent]} group-hover:underline`}
+                    className={`mt-4 text-base font-bold ${ACCENT_CTA[theme.accent]} group-hover:underline`}
                   >
                     Open lesson →
                   </div>
@@ -92,7 +92,7 @@ export default function LessonsPage() {
       <div className="rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] p-6 flex flex-wrap gap-4 items-center justify-between">
         <div>
           <h3 className="font-display font-extrabold text-lg">Done learning?</h3>
-          <p className="text-sm text-[var(--text-muted)]">
+          <p className="text-base text-[var(--text-muted)]">
             Try a game mode, or take the post-test to measure improvement.
           </p>
         </div>
