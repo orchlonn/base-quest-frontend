@@ -28,9 +28,9 @@ const MODES: Array<{
   },
   {
     href: "/games/memory-match",
-    title: "Memory Match",
-    body: "Match equivalent values across binary, decimal, and hex.",
-    icon: "🧠",
+    title: "Place Value Trainer",
+    body: "A highlighted digit — calculate its exact decimal contribution. Builds place-value intuition.",
+    icon: "📍",
     accent: "lilac",
   },
   {
