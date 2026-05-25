@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
-import { BASE_LABELS, convertBase, type Base } from "@/lib/convert";
+import { BASE_LABELS, fromBase as parseBase, toBase as formatBase, type Base } from "@/lib/convert";
 
 const features = [
   {
@@ -25,21 +25,30 @@ const features = [
   },
 ] as const;
 
-const previewRows = [
-  { value: "11010110", fromBase: 2, toBase: 16, chip: "chip-sky" },
-  { value: "42", fromBase: 10, toBase: 2, chip: "chip-coral" },
-  { value: "FF", fromBase: 16, toBase: 10, chip: "chip-mint" },
-  { value: "17", fromBase: 8, toBase: 16, chip: "chip-gold" },
-] as const;
+type PreviewRow = { label: string; value: string; fromBase: Base; chip: string };
 
-const baseOptions: Base[] = [10, 2, 8, 16];
+const previewRows: PreviewRow[] = [
+  { label: "42 decimal", value: "42", fromBase: 10, chip: "chip-mint" },
+  { label: "FF hex", value: "FF", fromBase: 16, chip: "chip-lilac" },
+  { label: "1010 binary", value: "1010", fromBase: 2, chip: "chip-sky" },
+  { label: "52 octal", value: "52", fromBase: 8, chip: "chip-coral" },
+];
+
+const baseOrder: Base[] = [2, 10, 16, 8];
+
+const BASE_DISPLAY: Record<Base, { label: string; bg: string; text: string; border: string }> = {
+  2:  { label: "Binary",      bg: "bg-[var(--sky-soft)]",   text: "text-[var(--sky-dark)]",   border: "border-[#bde3fa]" },
+  10: { label: "Decimal",     bg: "bg-[var(--mint-soft)]",  text: "text-[var(--mint-dark)]",  border: "border-[#c7e9a2]" },
+  16: { label: "Hexadecimal", bg: "bg-[var(--lilac-soft)]", text: "text-[var(--lilac-dark)]", border: "border-[#e2c6ff]" },
+  8:  { label: "Octal",       bg: "bg-[var(--coral-soft)]", text: "text-[var(--coral-dark)]", border: "border-[#ffc4c4]" },
+};
 
 const colorMap: Record<string, { bar: string; chip: string }> = {
-  mint: { bar: "bg-[var(--mint)]", chip: "chip-mint" },
+  mint:  { bar: "bg-[var(--mint)]",  chip: "chip-mint" },
   coral: { bar: "bg-[var(--coral)]", chip: "chip-coral" },
-  gold: { bar: "bg-[var(--gold)]", chip: "chip-gold" },
+  gold:  { bar: "bg-[var(--gold)]",  chip: "chip-gold" },
   lilac: { bar: "bg-[var(--lilac)]", chip: "chip-lilac" },
-  sky: { bar: "bg-[var(--sky)]", chip: "chip-sky" },
+  sky:   { bar: "bg-[var(--sky)]",   chip: "chip-sky" },
 };
 
 export default function Landing() {
@@ -131,101 +140,117 @@ export default function Landing() {
 
 function LiveConversionPanel() {
   const [value, setValue] = useState("42");
-  const [fromBase, setFromBase] = useState<Base>(10);
-  const [toBase, setToBase] = useState<Base>(2);
-  const result = useMemo(
-    () => convertBase(value, fromBase, toBase),
-    [value, fromBase, toBase]
-  );
-  const cleanedValue = value.trim() || "this value";
+  const [inputBase, setInputBase] = useState<Base>(10);
+
+  const allConversions = useMemo<Record<Base, string> | null>(() => {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    const decimal = parseBase(trimmed, inputBase);
+    if (decimal === null) return null;
+    return {
+      2: formatBase(decimal, 2),
+      8: formatBase(decimal, 8),
+      10: formatBase(decimal, 10),
+      16: formatBase(decimal, 16),
+    };
+  }, [value, inputBase]);
 
   return (
     <>
       <div className="absolute inset-x-0 top-0 h-1.5 rounded-t-2xl bg-gradient-to-r from-[var(--mint)] via-[var(--sky)] to-[var(--coral)]" />
-      <div className="text-sm font-bold uppercase tracking-wider text-[var(--text-muted)] mb-3">
+
+      <div className="text-sm font-bold uppercase tracking-wider text-[var(--text-muted)] mb-2">
         Live conversion
       </div>
-      <p className="text-base text-[var(--text-muted)]">
-        Convert this value from one base to another.
+      <p className="text-base text-[var(--text)]">
+        Enter a number and choose its base — see it in{" "}
+        <strong className="font-extrabold">all four number systems</strong> at once.
       </p>
 
       <div className="mt-4 grid gap-3">
-        <label className="grid gap-1 text-sm font-bold text-[var(--text-muted)]">
-          Value to convert
-          <input
-            className="input font-mono text-lg"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            placeholder="Example: 101010"
-          />
-        </label>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <BaseSelect
-            label="Convert from"
-            value={fromBase}
-            onChange={setFromBase}
-          />
-          <BaseSelect label="Convert to" value={toBase} onChange={setToBase} />
+        <div className="grid gap-3 sm:grid-cols-[1fr_200px]">
+          <label className="grid gap-1 text-sm font-bold text-[var(--text-muted)]">
+            Number to convert
+            <input
+              className="input font-mono text-lg"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              placeholder="e.g. 42, 1010, or FF"
+            />
+          </label>
+          <label className="grid gap-1 text-sm font-bold text-[var(--text-muted)]">
+            It is written in
+            <select
+              className="input text-base font-bold"
+              value={inputBase}
+              onChange={(e) => setInputBase(Number(e.target.value) as Base)}
+            >
+              {baseOrder.map((base) => (
+                <option key={base} value={base}>
+                  {BASE_LABELS[base]} (base {base})
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
 
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
-          <div className="text-sm font-extrabold text-[var(--text-muted)]">
-            Convert {cleanedValue} from {BASE_LABELS[fromBase]} to{" "}
-            {BASE_LABELS[toBase]}
+        {allConversions !== null ? (
+          <div className="grid grid-cols-2 gap-2">
+            {baseOrder.map((base) => {
+              const d = BASE_DISPLAY[base];
+              const isInput = base === inputBase;
+              return (
+                <div
+                  key={base}
+                  className={`rounded-2xl border p-3 ${d.bg} ${d.border} ${
+                    isInput ? "ring-2 ring-[var(--text)]/20 ring-offset-1" : ""
+                  }`}
+                >
+                  <div className={`text-xs font-extrabold uppercase tracking-wide flex items-center gap-1.5 ${d.text}`}>
+                    {d.label}
+                    {isInput && (
+                      <span className="rounded-full bg-white/60 px-1.5 py-0.5 text-[10px] font-bold">
+                        input
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-1 font-mono text-xl font-black break-all leading-tight">
+                    {allConversions[base]}
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <div className="mt-2 font-mono text-3xl font-black break-words">
-            {result ?? "Invalid input"}
+        ) : (
+          <div className="rounded-2xl border border-[var(--coral)] bg-[var(--coral-soft)] p-3">
+            <p className="text-base font-bold text-[var(--coral-dark)]">
+              Invalid {BASE_LABELS[inputBase]} input — check your digits.
+            </p>
+            <p className="mt-1 text-sm text-[var(--coral-dark)]/80">
+              {inputBase === 2 && "Binary only uses 0 and 1."}
+              {inputBase === 8 && "Octal only uses digits 0 through 7."}
+              {inputBase === 10 && "Decimal only uses digits 0 through 9."}
+              {inputBase === 16 && "Hex uses digits 0–9 and letters A–F."}
+            </p>
           </div>
-        </div>
+        )}
 
-        <div className="flex flex-wrap gap-2">
-          {previewRows.map((row) => {
-            const converted = convertBase(row.value, row.fromBase, row.toBase);
-            return (
-              <button
-                key={`${row.value}-${row.fromBase}-${row.toBase}`}
-                className={`chip ${row.chip}`}
-                onClick={() => {
-                  setValue(row.value);
-                  setFromBase(row.fromBase);
-                  setToBase(row.toBase);
-                }}
-              >
-                {row.value} {BASE_LABELS[row.fromBase]} to {converted ?? "?"}{" "}
-                {BASE_LABELS[row.toBase]}
-              </button>
-            );
-          })}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-bold text-[var(--text-muted)]">Try an example:</span>
+          {previewRows.map((row) => (
+            <button
+              key={`${row.value}-${row.fromBase}`}
+              className={`chip ${row.chip} cursor-pointer`}
+              onClick={() => {
+                setValue(row.value);
+                setInputBase(row.fromBase);
+              }}
+            >
+              {row.label}
+            </button>
+          ))}
         </div>
       </div>
     </>
-  );
-}
-
-function BaseSelect({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: Base;
-  onChange: (base: Base) => void;
-}) {
-  return (
-    <label className="grid gap-1 text-sm font-bold text-[var(--text-muted)]">
-      {label}
-      <select
-        className="input text-base font-bold"
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value) as Base)}
-      >
-        {baseOptions.map((base) => (
-          <option key={base} value={base}>
-            {BASE_LABELS[base]} (base {base})
-          </option>
-        ))}
-      </select>
-    </label>
   );
 }

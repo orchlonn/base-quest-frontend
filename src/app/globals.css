@@ -84,9 +84,10 @@ body {
 
   /* ── Buttons ──────────────────────────────────────────── */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3
       font-extrabold uppercase tracking-wide text-base select-none
       transition-transform duration-100 disabled:opacity-50 disabled:cursor-not-allowed;
+    letter-spacing: 0.04em;
   }
   .btn-primary {
     @apply btn;
@@ -129,6 +130,9 @@ body {
     background: var(--sky);
     box-shadow: 0 4px 0 var(--sky-dark);
   }
+  .btn-sky:hover:not(:disabled) {
+    filter: brightness(1.06);
+  }
   .btn-sky:active:not(:disabled) {
     transform: translateY(2px);
     box-shadow: 0 2px 0 var(--sky-dark);
@@ -139,15 +143,22 @@ body {
     background: var(--coral);
     box-shadow: 0 4px 0 var(--coral-dark);
   }
+  .btn-coral:hover:not(:disabled) {
+    filter: brightness(1.06);
+  }
   .btn-coral:active:not(:disabled) {
     transform: translateY(2px);
     box-shadow: 0 2px 0 var(--coral-dark);
   }
 
   .btn-gold {
-    @apply btn text-white;
+    @apply btn;
+    color: #3d2800;
     background: var(--gold);
     box-shadow: 0 4px 0 var(--gold-dark);
+  }
+  .btn-gold:hover:not(:disabled) {
+    filter: brightness(1.06);
   }
   .btn-gold:active:not(:disabled) {
     transform: translateY(2px);
@@ -158,6 +169,9 @@ body {
     @apply btn text-white;
     background: var(--lilac);
     box-shadow: 0 4px 0 var(--lilac-dark);
+  }
+  .btn-lilac:hover:not(:disabled) {
+    filter: brightness(1.06);
   }
   .btn-lilac:active:not(:disabled) {
     transform: translateY(2px);

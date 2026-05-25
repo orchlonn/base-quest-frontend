@@ -16,19 +16,27 @@ type Tile = {
 };
 
 const ACCENT_BAR: Record<Tile["accent"], string> = {
-  mint: "bg-[var(--mint)]",
+  mint:  "bg-[var(--mint)]",
   coral: "bg-[var(--coral)]",
-  gold: "bg-[var(--gold)]",
-  sky: "bg-[var(--sky)]",
+  gold:  "bg-[var(--gold)]",
+  sky:   "bg-[var(--sky)]",
   lilac: "bg-[var(--lilac)]",
 };
 
 const ACCENT_CTA: Record<Tile["accent"], string> = {
-  mint: "text-[var(--mint-dark)]",
+  mint:  "text-[var(--mint-dark)]",
   coral: "text-[var(--coral-dark)]",
-  gold: "text-[var(--gold-dark)]",
-  sky: "text-[var(--sky-dark)]",
+  gold:  "text-[var(--gold-dark)]",
+  sky:   "text-[var(--sky-dark)]",
   lilac: "text-[var(--lilac-dark)]",
+};
+
+const ACCENT_SOFT: Record<Tile["accent"], string> = {
+  mint:  "bg-[var(--mint-soft)]",
+  coral: "bg-[var(--coral-soft)]",
+  gold:  "bg-[var(--gold-soft)]",
+  sky:   "bg-[var(--sky-soft)]",
+  lilac: "bg-[var(--lilac-soft)]",
 };
 
 export default function DashboardPage() {
@@ -39,43 +47,45 @@ export default function DashboardPage() {
   const tiles: Tile[] = [
     {
       href: hasPreTest ? "/lessons" : "/pre-test",
-      title: hasPreTest ? "Lessons: continue learning" : "Start the pre-test",
+      title: hasPreTest ? "Study the lessons" : "Take the pre-test first",
       body: hasPreTest
-        ? "Review concepts, visuals, and guided examples before playing."
-        : "Take the pre-test to unlock the full game.",
-      cta: hasPreTest ? "Open lesson list" : "Take the pre-test",
+        ? "Read explanations, view visual diagrams, and practice conversions before playing."
+        : "The pre-test measures your baseline knowledge and unlocks all game modes.",
+      cta: hasPreTest ? "Open lesson list" : "Begin pre-test",
       icon: "📚",
       accent: "mint",
     },
     {
       href: "/games",
-      title: "Games: choose a mode",
-      body: "Practice conversions through timed, memory, defense, and quiz modes.",
-      cta: "Choose a game mode",
+      title: "Play a game mode",
+      body: "Practice conversions in timed, memory, defense, and multiple-choice formats.",
+      cta: "Browse game modes",
       icon: "🎮",
       accent: "coral",
     },
     {
       href: "/how-to-play",
-      title: "Guide: rules and scoring",
-      body: "See how XP, streak bonuses, badges, and game scoring work.",
-      cta: "Read rules and scoring",
+      title: "Read the rules and scoring",
+      body: "Learn how XP, streaks, difficulty levels, and badges work before you play.",
+      cta: "View rules guide",
       icon: "📖",
       accent: "sky",
     },
     {
       href: "/post-test",
-      title: "Post-test: measure growth",
-      body: "Compare your final score against your pre-test baseline.",
-      cta: "Start post-test quiz",
+      title: "Measure your growth",
+      body: "Take the post-test to see how much your score improved since the pre-test.",
+      cta: "Start post-test",
       icon: "🎯",
       accent: "coral",
     },
   ];
+
   const analysis = buildAnalysis(progress);
 
   return (
     <div className="space-y-8">
+      {/* Hero / XP section */}
       <section className="rounded-3xl border border-[var(--border)] bg-white p-6 shadow-card">
         <div className="grid gap-5 md:grid-cols-[1fr_360px] md:items-center">
           <div>
@@ -84,7 +94,7 @@ export default function DashboardPage() {
               Welcome back, {profile.username}
             </h1>
             <p className="mt-2 max-w-2xl text-base text-[var(--text-muted)]">
-              Track your lessons, scores, speed, and accuracy from one place.
+              Track your lessons, game scores, speed, and accuracy from one place.
             </p>
           </div>
           <XPBar
@@ -96,9 +106,11 @@ export default function DashboardPage() {
         </div>
       </section>
 
+      {/* Action tiles */}
       <section>
-        <h2 className="section-title">Pick your next step</h2>
-        <div className="grid gap-4 md:grid-cols-3 mt-4">
+        <h2 className="section-title">What do you want to do next?</h2>
+        <p className="section-sub mt-1">Each tile goes to a different part of the app.</p>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-4">
           {tiles.map((t, i) => (
             <motion.div
               key={t.href + t.title}
@@ -109,17 +121,19 @@ export default function DashboardPage() {
             >
               <Link
                 href={t.href}
-                className="tile block group"
+                className="tile block group h-full"
                 aria-label={t.cta}
               >
                 <div className={`tile-accent ${ACCENT_BAR[t.accent]}`} />
-                <div className="text-3xl">{t.icon}</div>
-                <h3 className="mt-3 font-display font-extrabold text-lg">{t.title}</h3>
-                <p className="mt-1 text-base text-[var(--text-muted)]">{t.body}</p>
+                <div className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl text-2xl ${ACCENT_SOFT[t.accent]}`}>
+                  {t.icon}
+                </div>
+                <h3 className="mt-3 font-display font-extrabold text-base leading-snug">{t.title}</h3>
+                <p className="mt-1.5 text-sm text-[var(--text-muted)] leading-relaxed">{t.body}</p>
                 <span
-                  className={`mt-4 inline-flex rounded-xl bg-[var(--surface-2)] px-3 py-2 text-base font-extrabold ${ACCENT_CTA[t.accent]} group-hover:underline`}
+                  className={`mt-4 inline-flex items-center gap-1 rounded-xl bg-[var(--surface-2)] px-3 py-2 text-sm font-extrabold ${ACCENT_CTA[t.accent]} group-hover:underline`}
                 >
-                  {t.cta}
+                  {t.cta} →
                 </span>
               </Link>
             </motion.div>
@@ -127,6 +141,7 @@ export default function DashboardPage() {
         </div>
       </section>
 
+      {/* Performance analysis */}
       <section className="card">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -138,6 +153,7 @@ export default function DashboardPage() {
           <span className="chip chip-sky">{analysis.status}</span>
         </div>
 
+        {/* Key metrics */}
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {analysis.metrics.map((metric) => (
             <PerformanceMetric
@@ -149,6 +165,44 @@ export default function DashboardPage() {
           ))}
         </div>
 
+        {/* Topic breakdown */}
+        {analysis.topicBreakdown && analysis.topicBreakdown.length > 0 && (
+          <div className="mt-5">
+            <div className="text-sm font-extrabold uppercase tracking-wide text-[var(--text-muted)] mb-3">
+              Topic accuracy (latest quiz)
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {analysis.topicBreakdown.map(({ topic, ratio }) => (
+                <TopicBar key={topic} topic={topic} ratio={ratio} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Timing trend */}
+        {analysis.timingTrend && (
+          <div className="mt-5">
+            <div className="text-sm font-extrabold uppercase tracking-wide text-[var(--text-muted)] mb-3">
+              Conversion challenge timing (last 3 sessions)
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {analysis.timingTrend.map((session, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2 text-center min-w-[80px]"
+                >
+                  <div className="text-xs font-bold text-[var(--text-muted)]">
+                    Session {analysis.timingTrend!.length - i}
+                  </div>
+                  <div className="font-mono text-lg font-black">{session.avg}s</div>
+                  <div className="text-xs text-[var(--text-muted)]">{session.accuracy}% acc</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Recommendation */}
         <div className="mt-5 rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
           <div className="text-sm font-extrabold uppercase tracking-wide text-[var(--text-muted)]">
             Recommended next move
@@ -157,6 +211,7 @@ export default function DashboardPage() {
         </div>
       </section>
 
+      {/* Badges */}
       <section className="card">
         <h2 className="font-display text-xl font-extrabold mb-4">Badges</h2>
         {profile.achievements.length === 0 ? (
@@ -191,29 +246,77 @@ export default function DashboardPage() {
   );
 }
 
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
 type Metric = {
   label: string;
   value: string;
   detail: string;
 };
 
-function buildAnalysis(progress: ReturnType<typeof useProgress>): {
+function PerformanceMetric({ label, value, detail }: Metric) {
+  return (
+    <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
+      <div className="text-sm font-extrabold uppercase tracking-wide text-[var(--text-muted)]">
+        {label}
+      </div>
+      <div className="mt-1 font-display text-2xl font-black">{value}</div>
+      <p className="mt-1 text-sm text-[var(--text-muted)] leading-relaxed">{detail}</p>
+    </div>
+  );
+}
+
+function TopicBar({ topic, ratio }: { topic: string; ratio: number }) {
+  const pct = Math.round(ratio * 100);
+  const barColor =
+    pct >= 80 ? "bg-[var(--mint)]" : pct >= 50 ? "bg-[var(--gold)]" : "bg-[var(--coral)]";
+  const label =
+    pct >= 80
+      ? "Strong"
+      : pct >= 50
+      ? "Developing"
+      : "Needs work";
+
+  return (
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2.5">
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-sm font-bold capitalize">{topic.toLowerCase()}</span>
+        <span className="text-sm font-bold text-[var(--text-muted)]">
+          {pct}% · {label}
+        </span>
+      </div>
+      <div className="h-2 rounded-full bg-[var(--border)]">
+        <div
+          className={`h-full rounded-full transition-all ${barColor}`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ─── Analysis logic ───────────────────────────────────────────────────────────
+
+type AnalysisResult = {
   status: string;
   metrics: Metric[];
   recommendation: string;
-} {
+  topicBreakdown: { topic: string; ratio: number }[] | null;
+  timingTrend: { avg: number; accuracy: number }[] | null;
+};
+
+function buildAnalysis(progress: ReturnType<typeof useProgress>): AnalysisResult {
   const pre = latestAttempt(progress.quizAttempts, "PRE_TEST");
   const post = latestAttempt(progress.quizAttempts, "POST_TEST");
   const gameScores = progress.gameScores;
-  const challengeScores = gameScores.filter(
-    (score) => score.mode === "CONVERSION_CHALLENGE"
-  );
+  const challengeScores = gameScores.filter((s) => s.mode === "CONVERSION_CHALLENGE");
   const latestChallenge = challengeScores[0];
   const previousChallenge = challengeScores[1];
-  const bestGame = maxBy(gameScores, (score) => score.score);
+  const bestGame = maxBy(gameScores, (s) => s.score);
   const avgGameScore = gameScores.length
-    ? Math.round(gameScores.reduce((sum, score) => sum + score.score, 0) / gameScores.length)
+    ? Math.round(gameScores.reduce((sum, s) => sum + s.score, 0) / gameScores.length)
     : null;
+
   const challengeMeta = latestChallenge?.meta ?? {};
   const latestAccuracy = readNumber(challengeMeta.accuracy);
   const averageAnswerSeconds = readNumber(challengeMeta.averageAnswerSeconds);
@@ -225,64 +328,96 @@ function buildAnalysis(progress: ReturnType<typeof useProgress>): {
   const weakest = weakestTopic(post ?? pre);
   const lesson = weakest ? lessonForTopic(weakest) : null;
 
+  // Topic breakdown from most recent quiz
+  const quizForBreakdown = post ?? pre;
+  const topicBreakdown = quizForBreakdown
+    ? Object.entries(quizForBreakdown.topicBreakdown)
+        .sort((a, b) => b[1] - a[1])
+        .map(([topic, ratio]) => ({ topic, ratio }))
+    : null;
+
+  // Timing trend: last 3 challenge sessions
+  const timingTrend =
+    challengeScores.length >= 2
+      ? challengeScores
+          .slice(0, 3)
+          .reverse()
+          .map((s) => ({
+            avg: readNumber(s.meta?.averageAnswerSeconds) ?? 0,
+            accuracy: readNumber(s.meta?.accuracy) ?? 0,
+          }))
+      : null;
+
   const metrics: Metric[] = [
     {
       label: "Pre-test",
       value: pre ? `${pre.score}%` : "Not taken",
-      detail: pre ? `${pre.correctCount}/${pre.totalItems} correct` : "Start here to set a baseline.",
+      detail: pre
+        ? `${pre.correctCount}/${pre.totalItems} correct`
+        : "Start here to set your baseline score.",
     },
     {
       label: "Post-test",
       value: post ? `${post.score}%` : "Pending",
       detail:
         improvement == null
-          ? "Take it after lessons and games."
-          : `${improvement >= 0 ? "+" : ""}${improvement} percentage points from pre-test.`,
+          ? "Take it after studying lessons and playing games."
+          : `${improvement >= 0 ? "+" : ""}${improvement} percentage points vs. pre-test.`,
     },
     {
       label: "Best game score",
       value: bestGame ? `${bestGame.score}` : "No games yet",
-      detail: avgGameScore == null ? "Play a mode to create a trend." : `Average score: ${avgGameScore}.`,
+      detail:
+        avgGameScore == null
+          ? "Play a game mode to start building a trend."
+          : `Average across all sessions: ${avgGameScore}.`,
     },
     {
       label: "Conversion speed",
-      value: averageAnswerSeconds == null ? "No timing yet" : `${averageAnswerSeconds}s`,
+      value: averageAnswerSeconds == null ? "No data yet" : `${averageAnswerSeconds}s avg`,
       detail:
         latestAccuracy == null
-          ? "Conversion Challenge records speed and accuracy."
-          : `${latestAccuracy}% accuracy${trend == null ? "." : `, ${formatTrend(trend)} last round.`}`,
+          ? "Conversion Challenge tracks per-question response time."
+          : `${latestAccuracy}% accuracy${
+              trend == null ? "." : ` · ${formatTrend(trend)} last round.`
+            }`,
     },
   ];
 
-  let recommendation = "Take the pre-test first so the dashboard can compare growth.";
+  let recommendation =
+    "Take the pre-test first — it unlocks games and sets your learning baseline.";
   if (pre) {
     recommendation = lesson
-      ? `Review ${lesson.title}, then play Conversion Challenge to practice ${weakest?.toLowerCase()} conversions.`
-      : "Play Conversion Challenge to build speed, then return for the post-test.";
+      ? `Review "${lesson.title}", then play Conversion Challenge to practice ${weakest?.toLowerCase()} conversions.`
+      : "Play Conversion Challenge to build speed, then take the post-test to measure growth.";
   }
   if (latestAccuracy != null && latestAccuracy < 70) {
     recommendation =
-      "Slow down and use the rule shown in Conversion Challenge. Aim for 80% accuracy before chasing speed.";
+      "Focus on accuracy before speed. Study the worked examples in Conversion Challenge, then aim for 80% before increasing difficulty.";
   } else if (averageAnswerSeconds != null && averageAnswerSeconds > 8) {
     recommendation =
-      "Practice the grouping shortcuts for binary, octal, and hex to bring average response time under 8 seconds.";
+      "Practice the bit-grouping shortcuts: binary ↔ hex (groups of 4), binary ↔ octal (groups of 3). These cut response time significantly.";
   } else if (post && improvement != null && improvement > 0) {
     recommendation =
-      "Nice upward trend. Keep rotating between lessons and timed rounds to protect both accuracy and speed.";
+      "Great improvement! Keep rotating between lessons for accuracy and timed games for speed to protect both skills.";
   }
 
   return {
     status: gameScores.length || pre || post ? "Personalized" : "Waiting for data",
     metrics,
     recommendation,
+    topicBreakdown,
+    timingTrend,
   };
 }
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function latestAttempt(
   attempts: QuizAttempt[],
   kind: QuizAttempt["kind"]
 ): QuizAttempt | null {
-  return attempts.find((attempt) => attempt.kind === kind) ?? null;
+  return attempts.find((a) => a.kind === kind) ?? null;
 }
 
 function maxBy<T>(items: T[], pick: (item: T) => number): T | null {
@@ -297,41 +432,18 @@ function readNumber(value: unknown): number | null {
 function weakestTopic(attempt: QuizAttempt | null): string | null {
   if (!attempt) return null;
   return (
-    Object.entries(attempt.topicBreakdown).sort((a, b) => a[1] - b[1])[0]?.[0] ??
-    null
+    Object.entries(attempt.topicBreakdown).sort((a, b) => a[1] - b[1])[0]?.[0] ?? null
   );
 }
 
 function lessonForTopic(topic: string) {
   return LESSONS.find(
-    (lesson) =>
-      lesson.topic === topic ||
-      (topic === "HEXADECIMAL" && lesson.topic === "HEXADECIMAL")
+    (l) => l.topic === topic || (topic === "HEXADECIMAL" && l.topic === "HEXADECIMAL")
   );
 }
 
 function formatTrend(trend: number): string {
-  if (trend > 0) return `up ${trend} points from your`;
-  if (trend < 0) return `down ${Math.abs(trend)} points from your`;
-  return "same score as your";
-}
-
-function PerformanceMetric({
-  label,
-  value,
-  detail,
-}: {
-  label: string;
-  value: string;
-  detail: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-4">
-      <div className="text-sm font-extrabold uppercase tracking-wide text-[var(--text-muted)]">
-        {label}
-      </div>
-      <div className="mt-1 font-display text-2xl font-black">{value}</div>
-      <p className="mt-1 text-base text-[var(--text-muted)]">{detail}</p>
-    </div>
-  );
+  if (trend > 0) return `up ${trend} points from`;
+  if (trend < 0) return `down ${Math.abs(trend)} points from`;
+  return "same score as";
 }
