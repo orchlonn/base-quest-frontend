@@ -1,12 +1,25 @@
 "use client";
 import { recordGameScore } from "@/lib/local-progress";
-import { generateProblem } from "@/lib/convert";
+import {
+  generateProblem,
+  hintForType,
+  explainConversion,
+  type ConvType,
+  type ExplainLine,
+} from "@/lib/convert";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 
 const TIME = 60;
 
-type MCQ = { prompt: string; answer: string; choices: string[]; createdAt: number };
+type MCQ = {
+  type: ConvType;
+  prompt: string;
+  display: string;
+  answer: string;
+  choices: string[];
+  createdAt: number;
+};
 
 function makeMCQ(): MCQ {
   const p = generateProblem("MEDIUM");
@@ -23,7 +36,9 @@ function makeMCQ(): MCQ {
   }
   const shuffled = [...choices].sort(() => Math.random() - 0.5);
   return {
+    type: p.type,
     prompt: p.prompt,
+    display: p.display,
     answer: p.answer,
     choices: shuffled,
     createdAt: Date.now(),
@@ -39,6 +54,12 @@ export default function SpeedQuiz() {
   const [maxStreak, setMaxStreak] = useState(0);
   const [flash, setFlash] = useState<"good" | "bad" | null>(null);
   const [saved, setSaved] = useState(false);
+  const [hintVisible, setHintVisible] = useState(false);
+  const [explanation, setExplanation] = useState<{
+    lines: ExplainLine[];
+    wasCorrect: boolean;
+    answer: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!running) return;
@@ -68,12 +89,20 @@ export default function SpeedQuiz() {
     setTime(TIME);
     setQ(makeMCQ());
     setSaved(false);
+    setHintVisible(false);
+    setExplanation(null);
+    setFlash(null);
     setRunning(true);
   }
 
   function pick(choice: string) {
     if (!q || !running) return;
     const ok = choice === q.answer;
+
+    // Build explanation from current question before advancing
+    const lines = explainConversion(q.type, q.display, q.answer);
+    setExplanation({ lines, wasCorrect: ok, answer: q.answer });
+
     if (ok) {
       const elapsedMs = Date.now() - q.createdAt;
       const speedBonus = Math.max(0, 8 - Math.floor(elapsedMs / 500));
@@ -87,8 +116,12 @@ export default function SpeedQuiz() {
       setStreak(0);
       setFlash("bad");
     }
+
     setQ(makeMCQ());
+    setHintVisible(false);
     setTimeout(() => setFlash(null), 200);
+    // Explanation shows for 2.5s then fades
+    setTimeout(() => setExplanation(null), 2500);
   }
 
   const timeLow = time <= 10;
@@ -101,7 +134,7 @@ export default function SpeedQuiz() {
           Quick fingers
         </h1>
         <p className="text-base text-[var(--text-muted)] mt-1">
-          {TIME} seconds. Pick fast for speed bonuses.
+          {TIME} seconds. Pick fast for speed bonuses. See a hint if you get stuck.
         </p>
       </header>
 
@@ -155,7 +188,45 @@ export default function SpeedQuiz() {
                 <div className="text-2xl md:text-3xl font-mono font-extrabold mt-2 break-words">
                   {q.prompt}
                 </div>
-                <div className="grid grid-cols-2 gap-3 mt-5">
+
+                {/* Hint button */}
+                <div className="mt-3">
+                  <button
+                    className={`btn-secondary !text-sm !py-1.5 !px-3 ${hintVisible ? "!bg-[var(--gold-soft)] !border-[var(--gold)]" : ""}`}
+                    onClick={() => setHintVisible((v) => !v)}
+                  >
+                    💡 {hintVisible ? "Hide hint" : "Show hint"}
+                  </button>
+                </div>
+
+                {/* Hint panel */}
+                <AnimatePresence>
+                  {hintVisible && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      className="mt-2 rounded-xl border border-[var(--gold)] bg-[var(--gold-soft)] p-3"
+                    >
+                      <p className="text-xs font-extrabold text-[var(--gold-dark)] mb-2">
+                        💡 How to approach this:
+                      </p>
+                      <ol className="space-y-1.5">
+                        {hintForType(q.type).map((hint, i) => (
+                          <li key={i} className="flex gap-2 text-xs">
+                            <span className="shrink-0 h-4 w-4 rounded-full bg-[var(--gold)] text-[#3d2800] flex items-center justify-center text-[10px] font-black">
+                              {i + 1}
+                            </span>
+                            <span className="text-[var(--text-muted)] leading-relaxed">{hint}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Answer choices */}
+                <div className="grid grid-cols-2 gap-3 mt-4">
                   {q.choices.map((c) => (
                     <button
                       key={c}
@@ -166,6 +237,51 @@ export default function SpeedQuiz() {
                     </button>
                   ))}
                 </div>
+
+                {/* Explanation panel — shows after picking, auto-fades */}
+                <AnimatePresence>
+                  {explanation && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className={`mt-4 rounded-xl border p-3 space-y-1 ${
+                        explanation.wasCorrect
+                          ? "bg-[var(--mint-soft)] border-[#c7e9a2]"
+                          : "bg-[var(--coral-soft)] border-[#ffc4c4]"
+                      }`}
+                    >
+                      <p className={`text-xs font-extrabold mb-1.5 ${explanation.wasCorrect ? "text-[var(--mint-dark)]" : "text-[var(--coral-dark)]"}`}>
+                        {explanation.wasCorrect
+                          ? "Correct! Here is how it works:"
+                          : `Answer: ${explanation.answer} — here is the process:`}
+                      </p>
+                      {explanation.lines.slice(0, 6).map((line, i) => {
+                        if (line.label) {
+                          return (
+                            <p key={i} className={`text-[10px] font-extrabold uppercase tracking-wide pt-0.5 ${explanation.wasCorrect ? "text-[var(--mint-dark)]" : "text-[var(--coral-dark)]"}`}>
+                              {line.text}
+                            </p>
+                          );
+                        }
+                        return (
+                          <div
+                            key={i}
+                            className={`text-xs font-mono rounded px-1.5 py-0.5 ${
+                              line.highlight
+                                ? explanation.wasCorrect
+                                  ? "bg-white/70 text-[var(--mint-dark)] font-black"
+                                  : "bg-white/70 text-[var(--coral-dark)] font-black"
+                                : "bg-white/40 text-[var(--text-muted)]"
+                            }`}
+                          >
+                            {line.text}
+                          </div>
+                        );
+                      })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
             )}
           </AnimatePresence>
