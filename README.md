@@ -2,7 +2,7 @@
 
 Frontend for **Base Quest** — a gamified app for learning binary, hex, and decimal conversions through lessons, mini-games, and pre/post tests. Built with Next.js 14 (App Router), React 18, TypeScript, Tailwind CSS, Zustand, and Framer Motion.
 
-All progress, XP, and profile data is stored locally in the browser (`localStorage`). No backend or external API is required.
+All app content is bundled locally from JSON files in `src/data/`, and all progress, XP, and profile data is stored locally in the browser (`localStorage`). No backend, database, or external API is required.
 
 ## Prerequisites
 
@@ -59,12 +59,14 @@ src/
 │   ├── layout.tsx      # Root layout (NavBar lives here)
 │   └── page.tsx        # Landing page
 ├── components/         # Shared UI (NavBar, XPBar)
+├── data/               # Local JSON data for lessons, tests, badges, achievements
 ├── lib/                # convert, data, local-progress, xp helpers
 └── store/              # Zustand profile store
 ```
 
 ## How it works
 
+- **Local JSON content.** Lessons, pre-test questions, post-test questions, badges, and achievements are loaded from `src/data/*.json` through `src/lib/data.ts`.
 - **No login required.** A local profile is created on first visit and kept in `localStorage`.
 - **Lessons** teach the concepts; **games** reinforce them with XP rewards.
 - **Pre-test** establishes a baseline; **post-test** measures growth.
