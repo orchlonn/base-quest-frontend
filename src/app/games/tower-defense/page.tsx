@@ -12,11 +12,12 @@ type Enemy = {
   lane: number;
 };
 
-const LANES = [18, 38, 58, 78];
+const LANES = [13, 36, 59, 82];
 const MAX_ENEMIES = LANES.length;
 
 export default function TowerDefense() {
   const [running, setRunning] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
   const [baseHp, setBaseHp] = useState(100);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
@@ -72,20 +73,23 @@ export default function TowerDefense() {
   }, [running]);
 
   useEffect(() => {
-    if (running && baseHp <= 0) setRunning(false);
+    if (running && baseHp <= 0) {
+      setRunning(false);
+      setGameOver(true);
+    }
   }, [baseHp, running]);
 
   useEffect(() => {
-    if (!running && score > 0 && !saved && baseHp <= 0) {
+    if (gameOver && score > 0 && !saved) {
       recordGameScore({
         mode: "TOWER_DEFENSE",
         score,
         streakMax: maxStreak,
-        meta: { baseHpRemaining: baseHp },
+        meta: { baseHpRemaining: 0 },
       });
       setSaved(true);
     }
-  }, [running, score, maxStreak, saved, baseHp]);
+  }, [gameOver, score, maxStreak, saved]);
 
   function start() {
     setBaseHp(100);
@@ -95,6 +99,7 @@ export default function TowerDefense() {
     setEnemies([]);
     setGuess("");
     setSaved(false);
+    setGameOver(false);
     setRunning(true);
   }
 
@@ -143,9 +148,9 @@ export default function TowerDefense() {
         <div className="chip chip-sky !py-2 flex-1 justify-center min-w-[120px]">
           🔥 {streak}
         </div>
-        {!running && (
+        {!running && !gameOver && (
           <button className="btn-primary" onClick={start}>
-            {score === 0 ? "Start" : baseHp <= 0 ? "Play again" : "Resume"}
+            {score === 0 ? "Start" : "Resume"}
           </button>
         )}
       </div>
@@ -190,17 +195,22 @@ export default function TowerDefense() {
               }}
               exit={{ opacity: 0, scale: 0.4 }}
               transition={{ ease: "linear", duration: 0.6 }}
-              className={`absolute max-w-[220px] -translate-y-1/2 rounded-xl px-3 py-2 font-mono text-sm md:text-base font-bold leading-tight border-2 bg-white ${
+              className={`absolute w-[130px] -translate-y-1/2 rounded-xl px-2.5 py-2 border-2 bg-white ${
                 target?.id === e.id
-                  ? "border-[var(--coral)] text-[var(--coral-dark)] shadow-press-coral"
-                  : "border-[var(--border)] text-[var(--text)] shadow-card"
+                  ? "border-[var(--coral)] shadow-press-coral"
+                  : "border-[var(--border)] shadow-card"
               }`}
               style={{
                 left: `${Math.min(76, e.progress)}%`,
                 top: `${LANES[e.lane]}%`,
               }}
             >
-              👾 {e.problem.prompt}
+              <div className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-muted)] leading-none">
+                {e.problem.sourceLabel.slice(0, 3)} → {e.problem.targetLabel.slice(0, 3)}
+              </div>
+              <div className={`font-mono text-sm font-extrabold mt-0.5 truncate ${target?.id === e.id ? "text-[var(--coral-dark)]" : "text-[var(--text)]"}`}>
+                👾 {e.problem.display}
+              </div>
             </motion.div>
           ))}
         </AnimatePresence>
@@ -215,6 +225,60 @@ export default function TowerDefense() {
             }`}
           />
         )}
+
+        {/* Game over overlay */}
+        <AnimatePresence>
+          {gameOver && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="absolute inset-0 z-20 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            >
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                transition={{ delay: 0.15, type: "spring", stiffness: 260, damping: 20 }}
+                className="mx-4 w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-2xl border-2 border-[var(--coral)]"
+              >
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.3, type: "spring", stiffness: 300 }}
+                  className="text-6xl mb-3"
+                >
+                  💥
+                </motion.div>
+                <h2 className="font-display text-2xl font-black text-[var(--coral-dark)]">
+                  Base Destroyed!
+                </h2>
+                <p className="text-sm text-[var(--text-muted)] mt-1 mb-4">
+                  The enemies broke through your defenses.
+                </p>
+
+                <div className="grid grid-cols-2 gap-2 mb-5">
+                  <div className="rounded-xl bg-[var(--surface-2)] border border-[var(--border)] px-3 py-2">
+                    <div className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">Score</div>
+                    <div className="font-display text-xl font-black">{score}</div>
+                  </div>
+                  <div className="rounded-xl bg-[var(--surface-2)] border border-[var(--border)] px-3 py-2">
+                    <div className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">Best Streak</div>
+                    <div className="font-display text-xl font-black">{maxStreak}</div>
+                  </div>
+                </div>
+
+                {saved && (
+                  <p className="text-xs text-[var(--text-muted)] mb-3">
+                    Score saved to your profile.
+                  </p>
+                )}
+
+                <button className="btn-primary w-full" onClick={start}>
+                  Play again
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Targeting input */}
@@ -240,18 +304,6 @@ export default function TowerDefense() {
         </div>
       </div>
 
-      {!running && baseHp <= 0 && (
-        <div className="card text-center">
-          <div className="text-5xl mb-2">💥</div>
-          <div className="text-lg font-bold">Base destroyed!</div>
-          <div className="text-base text-[var(--text-muted)] mt-1">
-            Final score: <b className="text-[var(--text)]">{score}</b> · Best streak {maxStreak}
-          </div>
-          {saved && (
-            <p className="mt-2 text-sm text-[var(--text-muted)]">Saved to your profile.</p>
-          )}
-        </div>
-      )}
     </div>
   );
 }
