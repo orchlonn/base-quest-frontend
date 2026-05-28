@@ -1,16 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { pickPreTest, type PublicQuestion } from "@/lib/data";
-import { gradePreTest } from "@/lib/local-progress";
+import { gradePreTest, type GradeResult } from "@/lib/local-progress";
+import { TestFeedback } from "@/components/TestFeedback";
 
 export default function PreTestPage() {
-  const router = useRouter();
   const [questions, setQuestions] = useState<PublicQuestion[] | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [idx, setIdx] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState<GradeResult | null>(null);
 
   useEffect(() => {
     setQuestions(pickPreTest(10));
@@ -25,6 +25,20 @@ export default function PreTestPage() {
   }
   if (questions.length === 0) return <p>No pre-test questions available.</p>;
 
+  if (result) {
+    return (
+      <TestFeedback
+        title="Pre-test complete"
+        accent="mint"
+        result={result}
+        questions={questions}
+        answers={answers}
+        continueHref="/lessons?from=pre-test"
+        continueLabel="Open lessons"
+      />
+    );
+  }
+
   const q = questions[idx];
   const done = idx >= questions.length - 1;
   const progress = ((idx + 1) / questions.length) * 100;
@@ -38,9 +52,10 @@ export default function PreTestPage() {
       }));
       const result = gradePreTest(payload);
       sessionStorage.setItem("bq_pretest_result", JSON.stringify(result));
-      router.push("/lessons?from=pre-test");
+      setResult(result);
     } catch (e) {
       console.error(e);
+    } finally {
       setSubmitting(false);
     }
   }

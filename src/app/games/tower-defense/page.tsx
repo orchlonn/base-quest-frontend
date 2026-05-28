@@ -9,7 +9,11 @@ type Enemy = {
   problem: ReturnType<typeof generateProblem>;
   progress: number;
   hp: number;
+  lane: number;
 };
+
+const LANES = [18, 38, 58, 78];
+const MAX_ENEMIES = LANES.length;
 
 export default function TowerDefense() {
   const [running, setRunning] = useState(false);
@@ -31,7 +35,7 @@ export default function TowerDefense() {
       setEnemies((es) => {
         const moved = es.map((e) => ({
           ...e,
-          progress: e.progress + 3 + Math.random() * 1.5,
+          progress: e.progress + 1.4 + Math.random() * 0.7,
         }));
         const survivors: Enemy[] = [];
         let damage = 0;
@@ -44,20 +48,23 @@ export default function TowerDefense() {
       });
     }, 600);
     spawn.current = setInterval(() => {
-      setEnemies((es) =>
-        es.length >= 4
-          ? es
-          : [
-              ...es,
-              {
-                id: nextId.current++,
-                problem: generateProblem("MEDIUM"),
-                progress: 0,
-                hp: 1,
-              },
-            ]
-      );
-    }, 2000);
+      setEnemies((es) => {
+        if (es.length >= MAX_ENEMIES) return es;
+        const occupied = new Set(es.map((e) => e.lane));
+        const lane = LANES.findIndex((_, index) => !occupied.has(index));
+        if (lane === -1) return es;
+        return [
+          ...es,
+          {
+            id: nextId.current++,
+            problem: generateProblem("MEDIUM"),
+            progress: 0,
+            hp: 1,
+            lane,
+          },
+        ];
+      });
+    }, 2600);
     return () => {
       if (tick.current) clearInterval(tick.current);
       if (spawn.current) clearInterval(spawn.current);
@@ -159,7 +166,7 @@ export default function TowerDefense() {
 
       {/* Battlefield */}
       <div
-        className="rounded-2xl border border-[var(--border)] bg-[var(--mint-soft)] relative h-64 overflow-hidden"
+        className="rounded-2xl border border-[var(--border)] bg-[var(--mint-soft)] relative h-80 overflow-hidden"
         style={{ boxShadow: "0 2px 0 var(--border-strong)" }}
       >
         {/* lane bands */}
@@ -176,15 +183,22 @@ export default function TowerDefense() {
             <motion.div
               key={e.id}
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1, left: `${Math.min(85, e.progress)}%` }}
+              animate={{
+                opacity: 1,
+                left: `${Math.min(76, e.progress)}%`,
+                top: `${LANES[e.lane]}%`,
+              }}
               exit={{ opacity: 0, scale: 0.4 }}
               transition={{ ease: "linear", duration: 0.6 }}
-              className={`absolute top-1/2 max-w-[260px] -translate-y-1/2 rounded-xl px-3 py-2 font-mono text-base font-bold leading-tight border-2 bg-white ${
+              className={`absolute max-w-[220px] -translate-y-1/2 rounded-xl px-3 py-2 font-mono text-sm md:text-base font-bold leading-tight border-2 bg-white ${
                 target?.id === e.id
                   ? "border-[var(--coral)] text-[var(--coral-dark)] shadow-press-coral"
                   : "border-[var(--border)] text-[var(--text)] shadow-card"
               }`}
-              style={{ left: `${Math.min(85, e.progress)}%` }}
+              style={{
+                left: `${Math.min(76, e.progress)}%`,
+                top: `${LANES[e.lane]}%`,
+              }}
             >
               👾 {e.problem.prompt}
             </motion.div>

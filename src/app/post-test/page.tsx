@@ -1,16 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { pickPostTest, type PublicQuestion } from "@/lib/data";
-import { gradePostTest } from "@/lib/local-progress";
+import { gradePostTest, type PostTestResult } from "@/lib/local-progress";
+import { TestFeedback } from "@/components/TestFeedback";
 
 export default function PostTestPage() {
-  const router = useRouter();
   const [questions, setQuestions] = useState<PublicQuestion[] | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [idx, setIdx] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState<PostTestResult | null>(null);
 
   useEffect(() => {
     setQuestions(pickPostTest(10));
@@ -25,6 +25,20 @@ export default function PostTestPage() {
   }
   if (questions.length === 0) return <p>No post-test questions available.</p>;
 
+  if (result) {
+    return (
+      <TestFeedback
+        title="Post-test complete"
+        accent="coral"
+        result={result}
+        questions={questions}
+        answers={answers}
+        continueHref="/dashboard"
+        continueLabel="Open dashboard"
+      />
+    );
+  }
+
   const q = questions[idx];
   const done = idx >= questions.length - 1;
   const progress = ((idx + 1) / questions.length) * 100;
@@ -38,9 +52,10 @@ export default function PostTestPage() {
       }));
       const result = gradePostTest(payload);
       sessionStorage.setItem("bq_posttest_result", JSON.stringify(result));
-      router.push("/dashboard");
+      setResult(result);
     } catch (e) {
       console.error(e);
+    } finally {
       setSubmitting(false);
     }
   }
